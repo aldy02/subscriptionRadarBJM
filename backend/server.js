@@ -3,13 +3,17 @@ const dotenv = require("dotenv");
 const sequelize = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const path = require("path");
-
-
+const cors = require("cors");
 
 dotenv.config();
 const app = express();
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use(cors({
+  origin: "http://localhost:3000",
+  methods: "GET,POST,PUT,DELETE",
+  allowedHeaders: "Content-Type,Authorization"
+}));
 
 // Routes
 app.use("/api/auth", authRoutes);

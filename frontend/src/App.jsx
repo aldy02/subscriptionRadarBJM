@@ -1,11 +1,31 @@
-import { useState } from 'react'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Home from "./pages/Home";
+import AdminDashboard from "./pages/AdminDashboard";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
 
   return (
-    <div>
-      <h1 className='text-2xl text-blue-600'>Lorem ipsum</h1>
-    </div>
+    <Routes>
+
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/" element={
+        <ProtectedRoute allowedRoles={["subscriber", "non-subscriber", "admin"]}>
+          <Home />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin" element={
+        <ProtectedRoute allowedRoles={["admin"]}>
+          <AdminDashboard />
+        </ProtectedRoute>
+      } />
+      {/* Default Redirect */}
+      <Route path="*" element={<Login />} />
+
+    </Routes>
   )
 }
 
