@@ -1,9 +1,16 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
-import AdminDashboard from "./pages/AdminDashboard";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import UserData from "./pages/admin/UserData"
+import Koran from "./pages/admin/Koran"
+import Iklan from "./pages/admin/Iklan"
+import ArtikelData from "./pages/admin/ArtikelData"
+import ArtikelUpload from "./pages/admin/ArtikelUpload"
+import Settings from "./pages/admin/Settings"
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminLayout from "./layouts/AdminLayout";
 
 function App() {
 
@@ -17,11 +24,26 @@ function App() {
           <Home />
         </ProtectedRoute>
       } />
-      <Route path="/admin" element={
-        <ProtectedRoute allowedRoles={["admin"]}>
-          <AdminDashboard />
-        </ProtectedRoute>
-      } />
+
+      {/* Admin Routes */}
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <AdminLayout />
+          </ProtectedRoute>
+        }>
+
+        {/* Default Admin Page */}
+        <Route index element={<AdminDashboard />} />
+        <Route path="data-user" element={<UserData />} />
+        <Route path="koran" element={<Koran />} />
+        <Route path="iklan" element={<Iklan />} />
+        <Route path="artikel/data" element={<ArtikelData />} />
+        <Route path="artikel/upload" element={<ArtikelUpload />} />
+        <Route path="pengaturan" element={<Settings />} />
+      </Route>
+
       {/* Default Redirect */}
       <Route path="*" element={<Login />} />
 
