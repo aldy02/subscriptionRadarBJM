@@ -106,198 +106,327 @@ export default function UserData() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto p-6">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-            <div>
-              <h1 className="text-2xl font-semibold text-gray-900">List Data Pengguna</h1>
-              <p className="text-gray-600 mt-1">
-                Kelola data pengguna dan hak role mereka disini
-              </p>
+      <div className="lg:ml-0">
+        <div className="max-w-7xl mx-auto p-4 lg:p-6">
+          {/* Header */}
+          <div className="mb-6 lg:mb-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 lg:mb-6">
+              <div>
+                <h1 className="text-xl lg:text-2xl font-semibold text-gray-900">List Data Pengguna</h1>
+                <p className="text-gray-600 mt-1 text-sm lg:text-base">
+                  Kelola data pengguna dan hak role mereka disini
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              {/* Search */}
+              <div className="relative w-full sm:max-w-sm">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <input
+                  type="text"
+                  placeholder="Cari pengguna..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg 
+                             focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                             bg-white text-sm outline-none transition-all duration-200"
+                />
+              </div>
+
+              {/* Button Add User */}
+              <button
+                onClick={() => showResult('info', 'Fitur tambah user akan segera hadir')}
+                className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors duration-200 shadow-sm w-full sm:w-auto"
+              >
+                <Plus size={18} />
+                <span className="text-sm lg:text-base">Tambah</span>
+              </button>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            {/* Search */}
-            <div className="relative w-full sm:max-w-sm">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-              <input
-                type="text"
-                placeholder="Cari pengguna..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg 
-                           focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
-                           bg-white text-sm outline-none transition-all duration-200"
-              />
-            </div>
-
-            {/* Button Add User */}
-            <button
-              onClick={() => showResult('info', 'Fitur tambah user akan segera hadir')}
-              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors duration-200 shadow-sm"
-            >
-              <Plus size={18} />
-              Tambah
-            </button>
-          </div>
-        </div>
-
-        {/* Table */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="text-left py-4 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    User
-                  </th>
-                  <th className="text-left py-4 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Email
-                  </th>
-                  <th className="text-left py-4 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Alamat
-                  </th>
-                  <th className="text-left py-4 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    No HP
-                  </th>
-                  <th className="text-left py-4 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Role
-                  </th>
-                  <th className="text-center py-4 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Action
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {loading ? (
-                  <tr>
-                    <td colSpan={6} className="text-center py-12">
-                      <div className="flex flex-col items-center gap-3">
-                        <div className="animate-spin h-8 w-8 border-4 border-indigo-500 border-t-transparent rounded-full" />
-                        <span className="text-gray-500 text-sm">Loading users...</span>
-                      </div>
-                    </td>
+          {/* Desktop Table View */}
+          <div className="hidden lg:block bg-white rounded-xl border border-gray-200 shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-200">
+                    <th className="text-left py-4 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      User
+                    </th>
+                    <th className="text-left py-4 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Email
+                    </th>
+                    <th className="text-left py-4 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Alamat
+                    </th>
+                    <th className="text-left py-4 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      No HP
+                    </th>
+                    <th className="text-left py-4 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Role
+                    </th>
+                    <th className="text-center py-4 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Action
+                    </th>
                   </tr>
-                ) : users.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="text-center py-12">
-                      <div className="text-gray-500">
-                        <p className="text-lg font-medium">Pengguna tidak ditemukan</p>
-                        <p className="text-sm mt-1">Coba perbaiki parameter pencarian anda</p>
-                      </div>
-                    </td>
-                  </tr>
-                ) : (
-                  users.map((user, index) => (
-                    <tr
-                      key={user.id}
-                      className="hover:bg-gray-50 transition-colors duration-150"
-                    >
-                      <td className="py-4 px-6">
-                        <div className="flex items-center gap-3">
-                          <img
-                            src={`http://localhost:5000/uploads/${user.profile_photo || "default.jpg"}`}
-                            alt={user.name}
-                            className="w-10 h-10 rounded-full object-cover border border-gray-200"
-                          />
-                          <div>
-                            <div className="font-medium text-gray-900 text-sm">{user.name}</div>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {loading ? (
+                    <tr>
+                      <td colSpan={6} className="text-center py-12">
+                        <div className="flex flex-col items-center gap-3">
+                          <div className="animate-spin h-8 w-8 border-4 border-indigo-500 border-t-transparent rounded-full" />
+                          <span className="text-gray-500 text-sm">Loading users...</span>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : users.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="text-center py-12">
+                        <div className="text-gray-500">
+                          <p className="text-lg font-medium">Pengguna tidak ditemukan</p>
+                          <p className="text-sm mt-1">Coba perbaiki parameter pencarian anda</p>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    users.map((user, index) => (
+                      <tr
+                        key={user.id}
+                        className="hover:bg-gray-50 transition-colors duration-150"
+                      >
+                        <td className="py-4 px-6">
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={`http://localhost:5000/uploads/${user.profile_photo || "default.jpg"}`}
+                              alt={user.name}
+                              className="w-10 h-10 rounded-full object-cover border border-gray-200"
+                            />
+                            <div>
+                              <div className="font-medium text-gray-900 text-sm">{user.name}</div>
+                            </div>
                           </div>
+                        </td>
+                        <td className="py-4 px-6">
+                          <div className="text-sm text-gray-600">{user.email}</div>
+                        </td>
+                        <td className="py-4 px-6">
+                          <div className="text-sm text-gray-600 max-w-xs truncate">
+                            {user.address || <span className="text-gray-400">-</span>}
+                          </div>
+                        </td>
+                        <td className="py-4 px-6">
+                          <div className="text-sm text-gray-600">
+                            {user.phone || <span className="text-gray-400">-</span>}
+                          </div>
+                        </td>
+                        <td className="py-4 px-6">
+                          <span
+                            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getRoleBadge(user.role)}`}
+                          >
+                            {user.role === 'admin' ? 'Admin' :
+                              user.role === 'subscriber' ? 'Subscriber' :
+                                'Non-Subscriber'}
+                          </span>
+                        </td>
+                        <td className="py-4 px-6">
+                          <div className="flex justify-center items-center gap-1">
+                            <button
+                              onClick={() => handleEdit(user)}
+                              className="p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors duration-200"
+                              title="Edit"
+                            >
+                              <Edit2 size={16} />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(user)}
+                              className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                              title="Delete"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Desktop Pagination */}
+            <div className="bg-white px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="text-sm text-gray-500">
+                Showing {users.length} of {users.length} results
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setPage(prev => Math.max(prev - 1, 1))}
+                  disabled={page === 1 || totalPages <= 1}
+                  className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Previous
+                </button>
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: 3 }, (_, i) => {
+                    const pageNum = i + 1;
+                    const isActive = page === pageNum;
+                    const isDisabled = pageNum > totalPages;
+
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => !isDisabled && setPage(pageNum)}
+                        disabled={isDisabled}
+                        className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${isActive
+                          ? 'bg-indigo-600 text-white'
+                          : isDisabled
+                            ? 'text-gray-300 cursor-not-allowed'
+                            : 'text-gray-500 hover:bg-gray-50'
+                          }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                </div>
+                <button
+                  onClick={() => setPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={page >= totalPages || totalPages <= 1}
+                  className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Card View */}
+          <div className="lg:hidden space-y-4">
+            {loading ? (
+              <div className="text-center py-12">
+                <div className="flex flex-col items-center gap-3">
+                  <div className="animate-spin h-8 w-8 border-4 border-indigo-500 border-t-transparent rounded-full" />
+                  <span className="text-gray-500 text-sm">Loading users...</span>
+                </div>
+              </div>
+            ) : users.length === 0 ? (
+              <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
+                <div className="text-gray-500">
+                  <p className="text-lg font-medium">Pengguna tidak ditemukan</p>
+                  <p className="text-sm mt-1">Coba perbaiki parameter pencarian anda</p>
+                </div>
+              </div>
+            ) : (
+              users.map((user) => (
+                <div
+                  key={user.id}
+                  className="bg-white rounded-xl border border-gray-200 shadow-sm p-4"
+                >
+                  {/* User Info */}
+                  <div className="flex items-start gap-4 mb-4">
+                    <img
+                      src={`http://localhost:5000/uploads/${user.profile_photo || "default.jpg"}`}
+                      alt={user.name}
+                      className="w-12 h-12 rounded-full object-cover border border-gray-200 flex-shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-gray-900 text-sm truncate">{user.name}</h3>
+                          <p className="text-xs text-gray-600 truncate mt-0.5">{user.email}</p>
                         </div>
-                      </td>
-                      <td className="py-4 px-6">
-                        <div className="text-sm text-gray-600">{user.email}</div>
-                      </td>
-                      <td className="py-4 px-6">
-                        <div className="text-sm text-gray-600 max-w-xs truncate">
-                          {user.address || <span className="text-gray-400">-</span>}
-                        </div>
-                      </td>
-                      <td className="py-4 px-6">
-                        <div className="text-sm text-gray-600">
-                          {user.phone || <span className="text-gray-400">-</span>}
-                        </div>
-                      </td>
-                      <td className="py-4 px-6">
                         <span
-                          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getRoleBadge(user.role)}`}
+                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ${getRoleBadge(user.role)}`}
                         >
                           {user.role === 'admin' ? 'Admin' :
                             user.role === 'subscriber' ? 'Subscriber' :
                               'Non-Subscriber'}
                         </span>
-                      </td>
-                      <td className="py-4 px-6">
-                        <div className="flex justify-center items-center gap-1">
-                          <button
-                            onClick={() => handleEdit(user)}
-                            className="p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors duration-200"
-                            title="Edit"
-                          >
-                            <Edit2 size={16} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(user)}
-                            className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
-                            title="Delete"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                      </div>
+                    </div>
+                  </div>
 
-          {/* Pagination */}
-          <div className="bg-white px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="text-sm text-gray-500">
-              Showing {users.length} of {users.length} results
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setPage(prev => Math.max(prev - 1, 1))}
-                disabled={page === 1 || totalPages <= 1}
-                className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Previous
-              </button>
-              <div className="flex items-center gap-1">
-                {Array.from({ length: 3 }, (_, i) => {
-                  const pageNum = i + 1;
-                  const isActive = page === pageNum;
-                  const isDisabled = pageNum > totalPages;
+                  {/* Details */}
+                  <div className="space-y-2 text-xs">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500 font-medium">Alamat:</span>
+                      <span className="text-gray-700 text-right flex-1 ml-2 truncate">
+                        {user.address || <span className="text-gray-400">-</span>}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500 font-medium">No HP:</span>
+                      <span className="text-gray-700">
+                        {user.phone || <span className="text-gray-400">-</span>}
+                      </span>
+                    </div>
+                  </div>
 
-                  return (
+                  {/* Action Buttons */}
+                  <div className="flex justify-end items-center gap-2 mt-4 pt-3 border-t border-gray-100">
                     <button
-                      key={pageNum}
-                      onClick={() => !isDisabled && setPage(pageNum)}
-                      disabled={isDisabled}
-                      className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${isActive
-                        ? 'bg-indigo-600 text-white'
-                        : isDisabled
-                          ? 'text-gray-300 cursor-not-allowed'
-                          : 'text-gray-500 hover:bg-gray-50'
-                        }`}
+                      onClick={() => handleEdit(user)}
+                      className="p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors duration-200"
+                      title="Edit"
                     >
-                      {pageNum}
+                      <Edit2 size={16} />
                     </button>
-                  );
-                })}
+                    <button
+                      onClick={() => handleDelete(user)}
+                      className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                      title="Delete"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+
+            {/* Mobile Pagination */}
+            {users.length > 0 && (
+              <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+
+                <div className="flex items-center justify-center gap-2">
+                  <button
+                    onClick={() => setPage(prev => Math.max(prev - 1, 1))}
+                    disabled={page === 1 || totalPages <= 1}
+                    className="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Previous
+                  </button>
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: Math.min(3, totalPages) }, (_, i) => {
+                      const pageNum = i + 1;
+                      const isActive = page === pageNum;
+
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => setPage(pageNum)}
+                          className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                            isActive
+                              ? 'bg-indigo-600 text-white'
+                              : 'text-gray-500 hover:bg-gray-50'
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <button
+                    onClick={() => setPage(prev => Math.min(prev + 1, totalPages))}
+                    disabled={page >= totalPages || totalPages <= 1}
+                    className="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
-              <button
-                onClick={() => setPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={page >= totalPages || totalPages <= 1}
-                className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Next
-              </button>
-            </div>
+            )}
           </div>
         </div>
       </div>
