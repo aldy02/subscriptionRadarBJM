@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Edit2, Trash2, Plus, Search } from "lucide-react";
+import { Edit2, Trash2, Plus, Search, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 import { getUsers, updateUser, deleteUser } from "../../api/userApi";
 
 export default function UserData() {
@@ -11,8 +11,17 @@ export default function UserData() {
   const [loading, setLoading] = useState(false);
 
   // State modal
-  const [isOpen, setIsOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  
+  // State untuk modal konfirmasi delete
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
+  
+  // State untuk modal success/error
+  const [isResultOpen, setIsResultOpen] = useState(false);
+  const [resultType, setResultType] = useState('');
+  const [resultMessage, setResultMessage] = useState('');
 
   // Ambil data user
   const fetchUsers = async () => {
@@ -20,7 +29,7 @@ export default function UserData() {
       setLoading(true);
       const response = await getUsers(page, limit, search);
       setUsers(response.data.data);
-      setTotalPages(response.data.totalPages || 1);
+        setTotalPages(Math.ceil(response.data.total / limit));
     } catch (error) {
       console.error("Gagal mengambil data user:", error);
     } finally {
@@ -32,34 +41,52 @@ export default function UserData() {
     fetchUsers();
   }, [page, search]);
 
+  // Show result modal
+  const showResult = (type, message) => {
+    setResultType(type);
+    setResultMessage(message);
+    setIsResultOpen(true);
+    
+    // Auto close after 3 seconds
+    setTimeout(() => {
+      setIsResultOpen(false);
+    }, 3000);
+  };
+
   // Hapus user
-  const handleDelete = async (id) => {
-    if (window.confirm("Yakin ingin menghapus user ini?")) {
-      try {
-        await deleteUser(id);
-        alert("User berhasil dihapus");
-        fetchUsers();
-      } catch (error) {
-        alert("Gagal menghapus user");
-      }
+  const handleDelete = (user) => {
+    setUserToDelete(user);
+    setIsDeleteOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      await deleteUser(userToDelete.id);
+      showResult('success', 'User berhasil dihapus');
+      fetchUsers();
+      setIsDeleteOpen(false);
+      setUserToDelete(null);
+    } catch (error) {
+      showResult('error', 'Gagal menghapus user');
+      setIsDeleteOpen(false);
     }
   };
 
   // Buka modal edit
   const handleEdit = (user) => {
     setSelectedUser(user);
-    setIsOpen(true);
+    setIsEditOpen(true);
   };
 
   // Simpan perubahan user
   const handleSave = async () => {
     try {
-      await updateUser(selectedUser._id, selectedUser);
-      alert("Data user berhasil diperbarui");
+      await updateUser(selectedUser.id, selectedUser);
+      showResult('success', 'Data user berhasil diperbarui');
       fetchUsers();
-      setIsOpen(false);
+      setIsEditOpen(false);
     } catch (error) {
-      alert("Gagal memperbarui user");
+      showResult('error', error.response?.data?.message || 'Gagal memperbarui user');
     }
   };
 
@@ -109,7 +136,7 @@ export default function UserData() {
 
             {/* Button Add User */}
             <button
-              onClick={() => alert("Tambah user coming soon")}
+              onClick={() => showResult('info', 'Fitur tambah user akan segera hadir')}
               className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors duration-200 shadow-sm"
             >
               <Plus size={18} />
@@ -117,6 +144,7 @@ export default function UserData() {
             </button>
           </div>
         </div>
+        
         {/* Table */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
           <div className="overflow-x-auto">
@@ -165,7 +193,7 @@ export default function UserData() {
                 ) : (
                   users.map((user, index) => (
                     <tr
-                      key={user._id}
+                      key={user.id}
                       className="hover:bg-gray-50 transition-colors duration-150"
                     >
                       <td className="py-4 px-6">
@@ -212,7 +240,7 @@ export default function UserData() {
                             <Edit2 size={16} />
                           </button>
                           <button
-                            onClick={() => handleDelete(user._id)}
+                            onClick={() => handleDelete(user)}
                             className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
                             title="Delete"
                           >
@@ -276,7 +304,7 @@ export default function UserData() {
       </div>
 
       {/* Modal Edit User */}
-      {isOpen && (
+      {isEditOpen && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl p-0 w-full max-w-md max-h-[90vh] overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200">
             {/* Modal Header */}
@@ -287,7 +315,7 @@ export default function UserData() {
                   <p className="text-sm text-gray-600 mt-1">Update informasi dan role pengguna</p>
                 </div>
                 <button
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => setIsEditOpen(false)}
                   className="p-2 text-gray-400 hover:text-gray-600 hover:bg-white/50 rounded-full transition-all duration-200"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -318,7 +346,6 @@ export default function UserData() {
                       placeholder="Enter full name"
                     />
                   </div>
-
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -400,18 +427,139 @@ export default function UserData() {
             {/* Modal Footer */}
             <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
               <button
-                onClick={() => setIsOpen(false)}
+                onClick={() => setIsEditOpen(false)}
                 className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm"
               >
                 Batal
               </button>
               <button
                 onClick={handleSave}
-                className="px-6 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className="px-6 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform"
               >
                 Simpan
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Delete Confirmation */}
+      {isDeleteOpen && userToDelete && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl p-0 w-full max-w-md overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-red-50 to-pink-50">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-red-100 rounded-full">
+                  <AlertTriangle className="w-6 h-6 text-red-600" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">Konfirmasi Hapus</h2>
+                  <p className="text-sm text-gray-600 mt-1">Tindakan ini tidak dapat dibatalkan</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <div className="px-6 py-6">
+              <div className="text-center">
+                <div className="mb-4">
+                  <img
+                    src={`http://localhost:5000/uploads/${userToDelete.profile_photo || "default.jpg"}`}
+                    alt={userToDelete.name}
+                    className="w-16 h-16 rounded-full object-cover border-2 border-gray-200 mx-auto"
+                  />
+                </div>
+                <p className="text-gray-700 mb-2">
+                  Apakah Anda yakin ingin menghapus user:
+                </p>
+                <p className="font-semibold text-gray-900 text-lg mb-1">
+                  {userToDelete.name}
+                </p>
+                <p className="text-gray-500 text-sm mb-4">
+                  {userToDelete.email}
+                </p>
+                <p className="text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-200">
+                  Data yang sudah dihapus tidak dapat dikembalikan!
+                </p>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setIsDeleteOpen(false);
+                  setUserToDelete(null);
+                }}
+                className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm"
+              >
+                Batal
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-6 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform"
+              >
+                Ya, Hapus
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Result (Success/Error) */}
+      {isResultOpen && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl p-0 w-full max-w-sm overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200">
+            {/* Modal Body */}
+            <div className="px-6 py-8 text-center">
+              <div className="mb-4">
+                {resultType === 'success' ? (
+                  <div className="p-3 bg-green-100 rounded-full w-fit mx-auto">
+                    <CheckCircle className="w-8 h-8 text-green-600" />
+                  </div>
+                ) : resultType === 'error' ? (
+                  <div className="p-3 bg-red-100 rounded-full w-fit mx-auto">
+                    <XCircle className="w-8 h-8 text-red-600" />
+                  </div>
+                ) : (
+                  <div className="p-3 bg-blue-100 rounded-full w-fit mx-auto">
+                    <AlertTriangle className="w-8 h-8 text-blue-600" />
+                  </div>
+                )}
+              </div>
+              <h3 className={`text-lg font-semibold mb-2 ${
+                resultType === 'success' ? 'text-green-700' : 
+                resultType === 'error' ? 'text-red-700' : 'text-blue-700'
+              }`}>
+                {resultType === 'success' ? 'Berhasil!' : 
+                 resultType === 'error' ? 'Gagal!' : 'Informasi'}
+              </h3>
+              <p className="text-gray-600 text-sm">
+                {resultMessage}
+              </p>
+            </div>
+
+            {/* Auto progress bar */}
+            <div className="h-1 bg-gray-200">
+              <div 
+                className={`h-full transition-all duration-3000 ease-linear ${
+                  resultType === 'success' ? 'bg-green-500' : 
+                  resultType === 'error' ? 'bg-red-500' : 'bg-blue-500'
+                }`}
+                style={{ 
+                  width: '0%',
+                  animation: 'progress 3s linear forwards'
+                }}
+              />
+            </div>
+
+            <style jsx>{`
+              @keyframes progress {
+                from { width: 0%; }
+                to { width: 100%; }
+              }
+            `}</style>
           </div>
         </div>
       )}
