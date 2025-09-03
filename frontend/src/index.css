@@ -5,3 +5,16 @@ html, body, #root {
   overflow: hidden; /* Supaya tidak ada scroll bar */
 }
 @import "tailwindcss";
+
+@keyframes progress {
+  from { 
+    width: 0%; 
+  }
+  to { 
+    width: 100%; 
+  }
+}
+
+.progress-animation {
+  animation: progress 3s linear forwards;
+}

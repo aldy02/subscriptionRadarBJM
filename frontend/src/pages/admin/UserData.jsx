@@ -10,26 +10,26 @@ export default function UserData() {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
 
-  // State modal
+  // State modal edit
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  
-  // State untuk modal konfirmasi delete
+
+  // State modal delete
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
-  
-  // State untuk modal success/error
+
+  // State modal success/error
   const [isResultOpen, setIsResultOpen] = useState(false);
   const [resultType, setResultType] = useState('');
   const [resultMessage, setResultMessage] = useState('');
 
-  // Ambil data user
+  // Get user data
   const fetchUsers = async () => {
     try {
       setLoading(true);
       const response = await getUsers(page, limit, search);
       setUsers(response.data.data);
-        setTotalPages(Math.ceil(response.data.total / limit));
+      setTotalPages(Math.ceil(response.data.total / limit));
     } catch (error) {
       console.error("Gagal mengambil data user:", error);
     } finally {
@@ -46,14 +46,14 @@ export default function UserData() {
     setResultType(type);
     setResultMessage(message);
     setIsResultOpen(true);
-    
+
     // Auto close after 3 seconds
     setTimeout(() => {
       setIsResultOpen(false);
     }, 3000);
   };
 
-  // Hapus user
+  // Delete user
   const handleDelete = (user) => {
     setUserToDelete(user);
     setIsDeleteOpen(true);
@@ -72,13 +72,13 @@ export default function UserData() {
     }
   };
 
-  // Buka modal edit
+  // Open modal edit
   const handleEdit = (user) => {
     setSelectedUser(user);
     setIsEditOpen(true);
   };
 
-  // Simpan perubahan user
+  // Save user changes
   const handleSave = async () => {
     try {
       await updateUser(selectedUser.id, selectedUser);
@@ -90,7 +90,7 @@ export default function UserData() {
     }
   };
 
-  // Function untuk mendapatkan warna badge berdasarkan role
+  // Function get color for role badge
   const getRoleBadge = (role) => {
     switch (role) {
       case "admin":
@@ -118,7 +118,6 @@ export default function UserData() {
             </div>
           </div>
 
-          {/* Search dan Add User sejajar */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             {/* Search */}
             <div className="relative w-full sm:max-w-sm">
@@ -129,7 +128,7 @@ export default function UserData() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg 
-                           focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 
+                           focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
                            bg-white text-sm outline-none transition-all duration-200"
               />
             </div>
@@ -144,7 +143,7 @@ export default function UserData() {
             </button>
           </div>
         </div>
-        
+
         {/* Table */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
           <div className="overflow-x-auto">
@@ -185,8 +184,8 @@ export default function UserData() {
                   <tr>
                     <td colSpan={6} className="text-center py-12">
                       <div className="text-gray-500">
-                        <p className="text-lg font-medium">No users found</p>
-                        <p className="text-sm mt-1">Try adjusting your search terms</p>
+                        <p className="text-lg font-medium">Pengguna tidak ditemukan</p>
+                        <p className="text-sm mt-1">Coba perbaiki parameter pencarian anda</p>
                       </div>
                     </td>
                   </tr>
@@ -528,12 +527,11 @@ export default function UserData() {
                   </div>
                 )}
               </div>
-              <h3 className={`text-lg font-semibold mb-2 ${
-                resultType === 'success' ? 'text-green-700' : 
-                resultType === 'error' ? 'text-red-700' : 'text-blue-700'
-              }`}>
-                {resultType === 'success' ? 'Berhasil!' : 
-                 resultType === 'error' ? 'Gagal!' : 'Informasi'}
+              <h3 className={`text-lg font-semibold mb-2 ${resultType === 'success' ? 'text-green-700' :
+                  resultType === 'error' ? 'text-red-700' : 'text-blue-700'
+                }`}>
+                {resultType === 'success' ? 'Berhasil!' :
+                  resultType === 'error' ? 'Gagal!' : 'Informasi'}
               </h3>
               <p className="text-gray-600 text-sm">
                 {resultMessage}
@@ -542,24 +540,13 @@ export default function UserData() {
 
             {/* Auto progress bar */}
             <div className="h-1 bg-gray-200">
-              <div 
-                className={`h-full transition-all duration-3000 ease-linear ${
-                  resultType === 'success' ? 'bg-green-500' : 
-                  resultType === 'error' ? 'bg-red-500' : 'bg-blue-500'
-                }`}
-                style={{ 
-                  width: '0%',
-                  animation: 'progress 3s linear forwards'
-                }}
+              <div
+                className={`h-full transition-all duration-3000 ease-linear progress-animation ${resultType === 'success' ? 'bg-green-500' :
+                    resultType === 'error' ? 'bg-red-500' : 'bg-blue-500'
+                  }`}
+                style={{ width: '0%' }}
               />
             </div>
-
-            <style jsx>{`
-              @keyframes progress {
-                from { width: 0%; }
-                to { width: 100%; }
-              }
-            `}</style>
           </div>
         </div>
       )}
