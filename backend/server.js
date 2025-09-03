@@ -1,10 +1,11 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const sequelize = require("./config/db");
-const authRoutes = require("./routes/authRoutes");
 const path = require("path");
 const cors = require("cors");
+const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
+const subscriptionPlanRoutes = require("./routes/subscriptionPlanRoutes")
 
 dotenv.config();
 const app = express();
@@ -19,6 +20,7 @@ app.use(cors({
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/subscription-plans", subscriptionPlanRoutes);
 
 // Test Database Connection
 sequelize.authenticate()
