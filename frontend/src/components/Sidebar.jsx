@@ -17,11 +17,11 @@ const menuItems = [
   { name: "Koran", icon: Newspaper, path: "/admin/koran" },
   { name: "Iklan", icon: Megaphone, path: "/admin/iklan" },
   {
-    name: "Artikel",
+    name: "Berita",
     icon: FileText,
     submenu: [
-      { name: "Data Artikel", path: "/admin/artikel/data" },
-      { name: "Upload Artikel", path: "/admin/artikel/upload" },
+      { name: "Data berita", path: "/admin/berita/data" },
+      { name: "Upload Berita", path: "/admin/berita/upload" },
     ],
   },
 ];
@@ -29,7 +29,7 @@ const menuItems = [
 export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [openMenu, setOpenMenu] = useState("Artikel");
+  const [openMenu, setOpenMenu] = useState("berita");
   const [user, setUser] = useState({
     name: "Guest",
     email: "guest@example.com",

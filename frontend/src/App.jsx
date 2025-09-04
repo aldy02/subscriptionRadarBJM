@@ -6,8 +6,8 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserData from "./pages/admin/UserData"
 import Koran from "./pages/admin/Koran"
 import Iklan from "./pages/admin/Iklan"
-import ArtikelData from "./pages/admin/ArtikelData"
-import ArtikelUpload from "./pages/admin/ArtikelUpload"
+import NewsData from "./pages/admin/NewsData"
+import NewsUpload from "./pages/admin/NewsUpload"
 import Settings from "./pages/admin/Settings"
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminLayout from "./layouts/AdminLayout";
@@ -20,7 +20,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/" element={
-        <ProtectedRoute allowedRoles={["subscriber", "non-subscriber", "admin"]}>
+        <ProtectedRoute allowedRoles={["customer", "admin"]}>
           <Home />
         </ProtectedRoute>
       } />
@@ -39,8 +39,8 @@ function App() {
         <Route path="data-user" element={<UserData />} />
         <Route path="koran" element={<Koran />} />
         <Route path="iklan" element={<Iklan />} />
-        <Route path="artikel/data" element={<ArtikelData />} />
-        <Route path="artikel/upload" element={<ArtikelUpload />} />
+        <Route path="berita/data" element={<NewsData />} />
+        <Route path="berita/upload" element={<NewsUpload />} />
         <Route path="pengaturan" element={<Settings />} />
       </Route>
 

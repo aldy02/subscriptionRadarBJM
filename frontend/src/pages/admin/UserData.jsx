@@ -95,9 +95,7 @@ export default function UserData() {
     switch (role) {
       case "admin":
         return "bg-blue-50 text-blue-700 border border-blue-200";
-      case "subscriber":
-        return "bg-green-50 text-green-700 border border-green-200";
-      case "non-subscriber":
+      case "customer":
         return "bg-gray-50 text-gray-600 border border-gray-200";
       default:
         return "bg-gray-50 text-gray-600 border border-gray-200";
@@ -225,9 +223,7 @@ export default function UserData() {
                           <span
                             className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getRoleBadge(user.role)}`}
                           >
-                            {user.role === 'admin' ? 'Admin' :
-                              user.role === 'subscriber' ? 'Subscriber' :
-                                'Non-Subscriber'}
+                            {user.role === 'admin' ? 'Admin' :'Customer'}
                           </span>
                         </td>
                         <td className="py-4 px-6">
@@ -340,9 +336,7 @@ export default function UserData() {
                         <span
                           className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ${getRoleBadge(user.role)}`}
                         >
-                          {user.role === 'admin' ? 'Admin' :
-                            user.role === 'subscriber' ? 'Subscriber' :
-                              'Non-Subscriber'}
+                          {user.role === 'admin' ? 'Admin' :'Customer'}
                         </span>
                       </div>
                     </div>
@@ -544,8 +538,7 @@ export default function UserData() {
                       text-sm transition-all duration-200"
                     >
                       <option value="admin">Admin</option>
-                      <option value="subscriber">Subscriber</option>
-                      <option value="non-subscriber">Non-Subscriber</option>
+                      <option value="customer">Customer</option>
                     </select>
                   </div>
                 </div>

@@ -6,6 +6,7 @@ const cors = require("cors");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const subscriptionPlanRoutes = require("./routes/subscriptionPlanRoutes")
+const newsRoutes = require("./routes/newsRoutes");
 
 dotenv.config();
 const app = express();
@@ -21,6 +22,7 @@ app.use(cors({
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/subscription-plans", subscriptionPlanRoutes);
+app.use("/api/news", newsRoutes);
 
 // Test Database Connection
 sequelize.authenticate()
