@@ -36,6 +36,8 @@ const News = sequelize.define("News", {
 }, {
   timestamps: true,
   tableName: "news",
+  createdAt: "created_at",
+  updatedAt: "updated_at"
 });
 
 module.exports = News;

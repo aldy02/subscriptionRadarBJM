@@ -523,23 +523,30 @@ export default function UserData() {
                     />
                   </div>
 
-                  <div>
+                     <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Role
                     </label>
-                    <select
-                      value={selectedUser.role}
-                      onChange={(e) =>
-                        setSelectedUser({ ...selectedUser, role: e.target.value })
-                      }
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl
-                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                      focus:outline-none bg-gray-50 focus:bg-white
-                      text-sm transition-all duration-200"
-                    >
-                      <option value="admin">Admin</option>
-                      <option value="customer">Customer</option>
-                    </select>
+                    <div className="relative">
+                      <select
+                        value={selectedUser.role}
+                        onChange={(e) =>
+                          setSelectedUser({ ...selectedUser, role: e.target.value })
+                        }
+                        className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl
+                        focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                        focus:outline-none bg-gray-50 focus:bg-white
+                        text-sm transition-all duration-200 appearance-none cursor-pointer"
+                      >
+                        <option value="admin">Admin</option>
+                        <option value="customer">Customer</option>
+                      </select>
+                      <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
+                        <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}

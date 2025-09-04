@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Editor } from '@tinymce/tinymce-react';
 import { createNews } from "../../api/newsApi";
+import { CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 
 export default function NewsUpload() {
   const [title, setTitle] = useState("");
@@ -9,8 +10,24 @@ export default function NewsUpload() {
   const [location, setLocation] = useState("");
   const [content, setContent] = useState("");
   const [photo, setPhoto] = useState(null);
-  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // State modal result
+  const [isResultOpen, setIsResultOpen] = useState(false);
+  const [resultType, setResultType] = useState('');
+  const [resultMessage, setResultMessage] = useState('');
+
+  // Show result modal
+  const showResult = (type, message) => {
+    setResultType(type);
+    setResultMessage(message);
+    setIsResultOpen(true);
+
+    // Auto close after 3 seconds
+    setTimeout(() => {
+      setIsResultOpen(false);
+    }, 3000);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,7 +43,7 @@ export default function NewsUpload() {
       if (photo) formData.append("photo", photo);
 
       const res = await createNews(formData);
-      setMessage({ type: 'success', text: res.data.message });
+      showResult('success', res.data.message || 'Berita berhasil dipublikasi');
 
       // Reset form
       setTitle("");
@@ -35,15 +52,12 @@ export default function NewsUpload() {
       setLocation("");
       setContent("");
       setPhoto(null);
-      
+
       // Reset file input
       document.getElementById('photo-input').value = '';
-      
+
     } catch (err) {
-      setMessage({ 
-        type: 'error', 
-        text: err.response?.data?.message || "Gagal upload berita" 
-      });
+      showResult('error', err.response?.data?.message || "Gagal upload berita");
     } finally {
       setLoading(false);
     }
@@ -57,16 +71,6 @@ export default function NewsUpload() {
     <div className="max-w-4xl mx-auto p-6 bg-white shadow rounded-lg">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">Upload Berita Baru</h2>
 
-      {message && (
-        <div className={`mb-4 p-3 rounded-md ${
-          message.type === 'success' 
-            ? 'bg-green-100 text-green-700 border border-green-300' 
-            : 'bg-red-100 text-red-700 border border-red-300'
-        }`}>
-          {message.text}
-        </div>
-      )}
-
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Title */}
         <div>
@@ -77,8 +81,11 @@ export default function NewsUpload() {
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            placeholder="Masukkan judul berita yang menarik..."
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl
+                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                      focus:outline-none bg-gray-50 focus:bg-white
+                      transition-all duration-200"
+            placeholder="Masukkan judul berita..."
             required
           />
         </div>
@@ -89,21 +96,31 @@ export default function NewsUpload() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Kategori <span className="text-red-500">*</span>
             </label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              required
-            >
-              <option value="Keuangan">💰 Keuangan</option>
-              <option value="Bisnis">💼 Bisnis</option>
-              <option value="Politik">🏛️ Politik</option>
-              <option value="Gaya Hidup">✨ Gaya Hidup</option>
-              <option value="Teknologi">💻 Teknologi</option>
-              <option value="Makanan & Minuman">🍽️ Makanan & Minuman</option>
-              <option value="Hiburan">🎬 Hiburan</option>
-              <option value="Olahraga">⚽ Olahraga</option>
-            </select>
+            <div className="relative">
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full px-4 py-3 pr-2 border border-gray-300 rounded-xl
+                          focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                          focus:outline-none bg-gray-50 focus:bg-white
+                          transition-all duration-200 appearance-none cursor-pointer"
+                required
+              >
+                <option value="Keuangan">💰 Keuangan</option>
+                <option value="Bisnis">💼 Bisnis</option>
+                <option value="Politik">🏛️ Politik</option>
+                <option value="Gaya Hidup">✨ Gaya Hidup</option>
+                <option value="Teknologi">💻 Teknologi</option>
+                <option value="Makanan & Minuman">🍽️ Makanan & Minuman</option>
+                <option value="Hiburan">🎬 Hiburan</option>
+                <option value="Olahraga">⚽ Olahraga</option>
+              </select>
+              <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
+                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
           </div>
 
           {/* Author */}
@@ -115,7 +132,10 @@ export default function NewsUpload() {
               type="text"
               value={author}
               onChange={(e) => setAuthor(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl
+                        focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                        focus:outline-none bg-gray-50 focus:bg-white
+                        transition-all duration-200"
               placeholder="Nama penulis"
               required
             />
@@ -131,8 +151,11 @@ export default function NewsUpload() {
             type="text"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            placeholder="Lokasi kejadian (opsional)"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl
+                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                      focus:outline-none bg-gray-50 focus:bg-white
+                      transition-all duration-200"
+            placeholder="Lokasi (opsional)"
           />
         </div>
 
@@ -146,7 +169,12 @@ export default function NewsUpload() {
             type="file"
             accept="image/jpeg,image/jpg"
             onChange={(e) => setPhoto(e.target.files[0])}
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-colors"
+            className="w-full p-2 border border-gray-300 rounded-xl
+                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                      focus:outline-none bg-gray-50 focus:bg-white
+                      file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 
+                      file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 
+                      hover:file:bg-blue-100 transition-all duration-200"
           />
           <p className="text-sm text-gray-500 mt-1">
             Format: JPG/JPEG, Maksimal 5MB
@@ -158,7 +186,7 @@ export default function NewsUpload() {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Isi Berita <span className="text-red-500">*</span>
           </label>
-          <div className="border border-gray-300 rounded-md overflow-hidden">
+          <div className="border border-gray-300 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-all duration-200">
             <Editor
               apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
               value={content}
@@ -203,21 +231,17 @@ export default function NewsUpload() {
               }}
             />
           </div>
-          <p className="text-sm text-gray-500 mt-2">
-            💡 Gunakan toolbar di atas untuk formatting text, tambah gambar, dan fitur lainnya
-          </p>
         </div>
 
         {/* Submit Button */}
         <div className="flex justify-end pt-4">
           <button
             type="submit"
-            disabled={loading || !title || !author || !content}
-            className={`px-8 py-3 rounded-md font-medium transition-all duration-200 ${
-              loading || !title || !author || !content
-                ? 'bg-gray-400 cursor-not-allowed text-gray-200' 
-                : 'bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 text-white shadow-lg hover:shadow-xl transform hover:scale-105'
-            }`}
+            className="px-8 py-3 rounded-xl font-medium transition-all duration-200 
+                      bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 
+                      focus:ring-2 focus:ring-blue-500 text-white shadow-lg hover:shadow-xl 
+                      transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={loading}
           >
             {loading ? (
               <span className="flex items-center">
@@ -231,6 +255,64 @@ export default function NewsUpload() {
           </button>
         </div>
       </form>
+
+      {/* Modal Result (Success/Error) */}
+      {isResultOpen && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl p-0 w-full max-w-sm overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200">
+            {/* Modal Body */}
+            <div className="px-6 py-8 text-center">
+              <div className="mb-4">
+                {resultType === 'success' ? (
+                  <div className="p-3 bg-green-100 rounded-full w-fit mx-auto">
+                    <CheckCircle className="w-8 h-8 text-green-600" />
+                  </div>
+                ) : resultType === 'error' ? (
+                  <div className="p-3 bg-red-100 rounded-full w-fit mx-auto">
+                    <XCircle className="w-8 h-8 text-red-600" />
+                  </div>
+                ) : (
+                  <div className="p-3 bg-blue-100 rounded-full w-fit mx-auto">
+                    <AlertTriangle className="w-8 h-8 text-blue-600" />
+                  </div>
+                )}
+              </div>
+              <h3 className={`text-lg font-semibold mb-2 ${
+                resultType === 'success' ? 'text-green-700' :
+                resultType === 'error' ? 'text-red-700' : 'text-blue-700'
+              }`}>
+                {resultType === 'success' ? 'Berhasil!' :
+                  resultType === 'error' ? 'Gagal!' : 'Informasi'}
+              </h3>
+              <p className="text-gray-600 text-sm">
+                {resultMessage}
+              </p>
+            </div>
+
+            {/* Auto progress bar */}
+            <div className="h-1 bg-gray-200">
+              <div
+                className={`h-full transition-all duration-3000 ease-linear progress-animation ${
+                  resultType === 'success' ? 'bg-green-500' :
+                  resultType === 'error' ? 'bg-red-500' : 'bg-blue-500'
+                }`}
+                style={{ width: '0%' }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      <style jsx>{`
+        .progress-animation {
+          animation: progress 3s linear forwards;
+        }
+        
+        @keyframes progress {
+          from { width: 0%; }
+          to { width: 100%; }
+        }
+      `}</style>
     </div>
   );
 }

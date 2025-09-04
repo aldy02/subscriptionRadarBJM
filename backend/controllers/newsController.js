@@ -33,8 +33,9 @@ exports.createNews = async (req, res) => {
         category: news.category,
         author: news.author,
         location: news.location,
+        content: news.content,
         photo: news.photo,
-        createdAt: news.createdAt
+        created_at: news.created_at
       }
     });
   } catch (err) {
@@ -67,10 +68,10 @@ exports.getAllNews = async (req, res) => {
 
     const { count, rows: news } = await News.findAndCountAll({ 
       where: whereClause,
-      order: [["createdAt", "DESC"]],
+      order: [["created_at", "DESC"]],
       limit,
       offset,
-      attributes: ['id', 'title', 'category', 'author', 'location', 'photo', 'createdAt', 'updatedAt']
+      attributes: ['id', 'title', 'category', 'author', 'location', 'photo', 'content', 'created_at', 'updated_at']
     });
 
     res.json({
@@ -160,8 +161,9 @@ exports.updateNews = async (req, res) => {
         category: news.category,
         author: news.author,
         location: news.location,
+        content: news.content,
         photo: news.photo,
-        updatedAt: news.updatedAt
+        updated_at: news.updated_at
       }
     });
   } catch (err) {
