@@ -190,7 +190,7 @@ export default function NewsUpload() {
                 <option value="Politik">🏛️ Politik</option>
                 <option value="Gaya Hidup">✨ Gaya Hidup</option>
                 <option value="Teknologi">💻 Teknologi</option>
-                <option value="Makanan & Minuman">🍽️ Makanan & Minuman</option>
+                <option value="Makanan">🍽️ Makanan</option>
                 <option value="Hiburan">🎬 Hiburan</option>
                 <option value="Olahraga">⚽ Olahraga</option>
               </select>
@@ -271,7 +271,7 @@ export default function NewsUpload() {
                       hover:file:bg-blue-100 transition-all duration-200"
           />
           <p className="text-sm text-gray-500 mt-1">
-            Format: JPG/JPEG, Maksimal 5MB
+            Format: JPG/JPEG, Maksimal 2MB
           </p>
         </div>
 
