@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Edit2, Trash2, Plus, Search, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
-import { getUsers, updateUser, deleteUser } from "../../api/userApi";
+import { getUsers, updateUser, deleteUser, createUser } from "../../api/userApi";
 
 export default function UserData() {
   const [users, setUsers] = useState([]);
@@ -13,6 +13,15 @@ export default function UserData() {
   // State modal edit
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [newUser, setNewUser] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    role: "customer",
+    password: "",
+  });
 
   // State modal delete
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -69,6 +78,18 @@ export default function UserData() {
     } catch (error) {
       showResult('error', 'Gagal menghapus user');
       setIsDeleteOpen(false);
+    }
+  };
+
+  const handleAdd = async () => {
+    try {
+      await createUser(newUser);
+      showResult("success", "User berhasil ditambahkan");
+      fetchUsers();
+      setIsAddOpen(false);
+      setNewUser({ name: "", email: "", phone: "", address: "", role: "customer" });
+    } catch (error) {
+      showResult("error", error.response?.data?.message || "Gagal menambah user");
     }
   };
 
@@ -134,7 +155,7 @@ export default function UserData() {
 
               {/* Button Add User */}
               <button
-                onClick={() => showResult('info', 'Fitur tambah user akan segera hadir')}
+                onClick={() => setIsAddOpen(true)}
                 className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors duration-200 shadow-sm w-full sm:w-auto"
               >
                 <Plus size={18} />
@@ -223,7 +244,7 @@ export default function UserData() {
                           <span
                             className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getRoleBadge(user.role)}`}
                           >
-                            {user.role === 'admin' ? 'Admin' :'Customer'}
+                            {user.role === 'admin' ? 'Admin' : 'Customer'}
                           </span>
                         </td>
                         <td className="py-4 px-6">
@@ -336,7 +357,7 @@ export default function UserData() {
                         <span
                           className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ${getRoleBadge(user.role)}`}
                         >
-                          {user.role === 'admin' ? 'Admin' :'Customer'}
+                          {user.role === 'admin' ? 'Admin' : 'Customer'}
                         </span>
                       </div>
                     </div>
@@ -400,11 +421,10 @@ export default function UserData() {
                         <button
                           key={pageNum}
                           onClick={() => setPage(pageNum)}
-                          className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                            isActive
-                              ? 'bg-indigo-600 text-white'
-                              : 'text-gray-500 hover:bg-gray-50'
-                          }`}
+                          className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${isActive
+                            ? 'bg-indigo-600 text-white'
+                            : 'text-gray-500 hover:bg-gray-50'
+                            }`}
                         >
                           {pageNum}
                         </button>
@@ -424,6 +444,144 @@ export default function UserData() {
           </div>
         </div>
       </div>
+
+      {/* Modal Tambah User */}
+      {isAddOpen && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl p-0 w-full max-w-md max-h-[90vh] overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-indigo-50 to-blue-50">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">Tambah User</h2>
+                  <p className="text-sm text-gray-600 mt-1">Masukkan informasi user baru</p>
+                </div>
+                <button
+                  onClick={() => setIsAddOpen(false)}
+                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-white/50 rounded-full transition-all duration-200"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <div className="px-6 py-6 max-h-[60vh] overflow-y-auto">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
+                  <input
+                    type="text"
+                    value={newUser.name}
+                    onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl
+              focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+              focus:outline-none bg-gray-50 focus:bg-white
+              text-sm transition-all duration-200"
+                    placeholder="Masukkan nama lengkap"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                  <input
+                    type="email"
+                    value={newUser.email}
+                    onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl
+              focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+              focus:outline-none bg-gray-50 focus:bg-white
+              text-sm transition-all duration-200"
+                    placeholder="Masukkan alamat email"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                  <input
+                    type="password"
+                    value={newUser.password}
+                    onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl
+              focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+              focus:outline-none bg-gray-50 focus:bg-white
+              text-sm transition-all duration-200"
+                    placeholder="Masukkan password"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">No Handphone</label>
+                  <input
+                    type="text"
+                    value={newUser.phone}
+                    onChange={(e) => setNewUser({ ...newUser, phone: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl
+              focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+              focus:outline-none bg-gray-50 focus:bg-white
+              text-sm transition-all duration-200"
+                    placeholder="Masukkan no handphone"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Alamat</label>
+                  <textarea
+                    value={newUser.address}
+                    onChange={(e) => setNewUser({ ...newUser, address: e.target.value })}
+                    rows={3}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl
+              focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+              focus:outline-none bg-gray-50 focus:bg-white
+              text-sm transition-all duration-200"
+                    placeholder="Masukkan alamat"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                  <div className="relative">
+                    <select
+                      value={newUser.role}
+                      onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl
+                focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                focus:outline-none bg-gray-50 focus:bg-white
+                text-sm transition-all duration-200 appearance-none cursor-pointer"
+                    >
+                      <option value="customer">Customer</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                    <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
+                      <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+              <button
+                onClick={() => setIsAddOpen(false)}
+                className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleAdd}
+                className="px-6 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform"
+              >
+                Tambah
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal Edit User */}
       {isEditOpen && (
@@ -523,7 +681,7 @@ export default function UserData() {
                     />
                   </div>
 
-                     <div>
+                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Role
                     </label>
@@ -657,7 +815,7 @@ export default function UserData() {
                 )}
               </div>
               <h3 className={`text-lg font-semibold mb-2 ${resultType === 'success' ? 'text-green-700' :
-                  resultType === 'error' ? 'text-red-700' : 'text-blue-700'
+                resultType === 'error' ? 'text-red-700' : 'text-blue-700'
                 }`}>
                 {resultType === 'success' ? 'Berhasil!' :
                   resultType === 'error' ? 'Gagal!' : 'Informasi'}
@@ -671,7 +829,7 @@ export default function UserData() {
             <div className="h-1 bg-gray-200">
               <div
                 className={`h-full transition-all duration-3000 ease-linear progress-animation ${resultType === 'success' ? 'bg-green-500' :
-                    resultType === 'error' ? 'bg-red-500' : 'bg-blue-500'
+                  resultType === 'error' ? 'bg-red-500' : 'bg-blue-500'
                   }`}
                 style={{ width: '0%' }}
               />

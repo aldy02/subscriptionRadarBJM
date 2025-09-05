@@ -35,7 +35,7 @@ export const getAllUsers = async (req, res) => {
 // Add new user
 export const createUser = async (req, res) => {
   try {
-    const { name, email, role, password } = req.body;
+    const { name, email, role, password, phone, address } = req.body;
 
     // Check if email already exist
     const existingUser = await User.findOne({ where: { email } });
@@ -50,6 +50,9 @@ export const createUser = async (req, res) => {
       name,
       email,
       role,
+      phone,
+      address,
+      profile_photo: "default.jpg",
       password: hashedPassword,
     });
 

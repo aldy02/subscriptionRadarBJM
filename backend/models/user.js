@@ -14,8 +14,8 @@ const User = sequelize.define("user", {
     defaultValue: "default.jpg"
   },
   role: {
-    type: DataTypes.ENUM("admin", "subscriber", "non-subscriber"),
-    defaultValue: "non-subscriber"
+    type: DataTypes.ENUM("admin", "customer"),
+    defaultValue: "customer"
   }
 }, {
   tableName: "users",

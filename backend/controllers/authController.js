@@ -22,7 +22,7 @@ exports.register = async (req, res) => {
       email,
       password: hashedPassword,
       profile_photo: "default.jpg",
-      role: "non-subscriber",
+      role: "customer",
       phone: null,
       address: null,
     });
