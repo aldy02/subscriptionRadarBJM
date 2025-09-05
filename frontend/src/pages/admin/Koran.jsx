@@ -71,8 +71,7 @@ export default function Koran() {
       setEditingPlan(null);
       fetchPlans();
     } catch (error) {
-      showResult('error', 'Gagal menyimpan paket');
-      console.error("Gagal menyimpan paket:", error);
+      showResult('error', error.response?.data?.message || 'Gagal menyimpan paket');
     }
   };
 

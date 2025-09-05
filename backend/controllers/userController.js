@@ -37,6 +37,11 @@ export const createUser = async (req, res) => {
   try {
     const { name, email, role, password, phone, address } = req.body;
 
+    // Validasi wajib isi
+    if (!name || !email || !role || !password || !phone || !address) {
+      return res.status(400).json({ message: "Semua field wajib diisi" });
+    }
+
     // Check if email already exist
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {

@@ -10,8 +10,8 @@ export const createNews = (formData) => {
 };
 
 // Ambil semua berita
-export const getAllNews = () => {
-  return axios.get("/news");
+export const getAllNews = (params = {}) => {
+  return axios.get("/news", { params });
 };
 
 // Ambil berita by ID

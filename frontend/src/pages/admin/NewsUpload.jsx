@@ -1,21 +1,55 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Editor } from '@tinymce/tinymce-react';
-import { createNews } from "../../api/newsApi";
-import { CheckCircle, XCircle, AlertTriangle } from "lucide-react";
+import { createNews, getNewsById, updateNews } from "../../api/newsApi"; // Pastikan ada updateNews di API
+import { CheckCircle, XCircle, AlertTriangle, ArrowLeft } from "lucide-react";
+import { useParams, useNavigate } from "react-router-dom";
 
 export default function NewsUpload() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const isEdit = Boolean(id);
+
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("Keuangan");
   const [author, setAuthor] = useState("");
   const [location, setLocation] = useState("");
   const [content, setContent] = useState("");
   const [photo, setPhoto] = useState(null);
+  const [currentPhoto, setCurrentPhoto] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState(false);
 
   // State modal result
   const [isResultOpen, setIsResultOpen] = useState(false);
   const [resultType, setResultType] = useState('');
   const [resultMessage, setResultMessage] = useState('');
+
+  // Load data jika mode edit
+  useEffect(() => {
+    if (isEdit) {
+      loadNewsData();
+    }
+  }, [id, isEdit]);
+
+  const loadNewsData = async () => {
+    setLoadingData(true);
+    try {
+      const res = await getNewsById(id);
+      const newsData = res.data;
+      
+      setTitle(newsData.title || "");
+      setCategory(newsData.category || "Keuangan");
+      setAuthor(newsData.author || "");
+      setLocation(newsData.location || "");
+      setContent(newsData.content || "");
+      setCurrentPhoto(newsData.photo || null);
+    } catch (err) {
+      console.error("Error loading news data:", err);
+      showResult('error', 'Gagal memuat data berita');
+    } finally {
+      setLoadingData(false);
+    }
+  };
 
   // Show result modal
   const showResult = (type, message) => {
@@ -26,6 +60,12 @@ export default function NewsUpload() {
     // Auto close after 3 seconds
     setTimeout(() => {
       setIsResultOpen(false);
+      // Redirect ke halaman data setelah berhasil
+      if (type === 'success') {
+        setTimeout(() => {
+          navigate('/admin/berita/data');
+        }, 500);
+      }
     }, 3000);
   };
 
@@ -40,24 +80,36 @@ export default function NewsUpload() {
       formData.append("author", author);
       formData.append("location", location);
       formData.append("content", content);
-      if (photo) formData.append("photo", photo);
+      
+      // Hanya append photo jika ada file baru yang dipilih
+      if (photo) {
+        formData.append("photo", photo);
+      }
 
-      const res = await createNews(formData);
-      showResult('success', res.data.message || 'Berita berhasil dipublikasi');
+      let res;
+      if (isEdit) {
+        res = await updateNews(id, formData);
+        showResult('success', res.data.message || 'Berita berhasil diupdate');
+      } else {
+        res = await createNews(formData);
+        showResult('success', res.data.message || 'Berita berhasil dipublikasi');
 
-      // Reset form
-      setTitle("");
-      setCategory("Keuangan");
-      setAuthor("");
-      setLocation("");
-      setContent("");
-      setPhoto(null);
+        // Reset form hanya jika create
+        setTitle("");
+        setCategory("Keuangan");
+        setAuthor("");
+        setLocation("");
+        setContent("");
+        setPhoto(null);
+        setCurrentPhoto(null);
 
-      // Reset file input
-      document.getElementById('photo-input').value = '';
+        // Reset file input
+        const fileInput = document.getElementById('photo-input');
+        if (fileInput) fileInput.value = '';
+      }
 
     } catch (err) {
-      showResult('error', err.response?.data?.message || "Gagal upload berita");
+      showResult('error', err.response?.data?.message || `Gagal ${isEdit ? 'update' : 'upload'} berita`);
     } finally {
       setLoading(false);
     }
@@ -67,9 +119,36 @@ export default function NewsUpload() {
     setContent(content);
   };
 
+  const handleBackToData = () => {
+    navigate('/admin/berita/data');
+  };
+
+  if (loadingData) {
+    return (
+      <div className="max-w-4xl mx-auto p-6 bg-white shadow rounded-lg">
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Memuat data berita...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow rounded-lg">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Upload Berita Baru</h2>
+      {/* Header dengan back button */}
+      <div className="flex items-center mb-6">
+        <button
+          onClick={handleBackToData}
+          className="mr-4 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          type="button"
+        >
+          <ArrowLeft className="w-5 h-5 text-gray-600" />
+        </button>
+        <h2 className="text-2xl font-bold text-gray-800">
+          {isEdit ? 'Edit Berita' : 'Upload Berita Baru'}
+        </h2>
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Title */}
@@ -163,7 +242,22 @@ export default function NewsUpload() {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Foto Berita (JPG/JPEG)
+            {isEdit && !currentPhoto && <span className="text-gray-500 text-sm ml-2">(Tidak ada foto saat ini)</span>}
           </label>
+          
+          {/* Show current photo if editing */}
+          {isEdit && currentPhoto && (
+            <div className="mb-3">
+              <p className="text-sm text-gray-600 mb-2">Foto saat ini:</p>
+              <img
+                src={`http://localhost:5000/uploads/news/${currentPhoto}`}
+                alt="Current photo"
+                className="w-32 h-32 object-cover rounded-lg border border-gray-300"
+              />
+              <p className="text-xs text-gray-500 mt-1">Pilih foto baru jika ingin mengganti</p>
+            </div>
+          )}
+          
           <input
             id="photo-input"
             type="file"
@@ -249,9 +343,9 @@ export default function NewsUpload() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Mengupload...
+                {isEdit ? 'Mengupdate...' : 'Mengupload...'}
               </span>
-            ) : 'Publish Berita'}
+            ) : (isEdit ? 'Update Berita' : 'Publish Berita')}
           </button>
         </div>
       </form>
@@ -302,17 +396,6 @@ export default function NewsUpload() {
           </div>
         </div>
       )}
-
-      <style jsx>{`
-        .progress-animation {
-          animation: progress 3s linear forwards;
-        }
-        
-        @keyframes progress {
-          from { width: 0%; }
-          to { width: 100%; }
-        }
-      `}</style>
     </div>
   );
 }

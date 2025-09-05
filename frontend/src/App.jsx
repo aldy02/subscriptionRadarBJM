@@ -41,6 +41,7 @@ function App() {
         <Route path="iklan" element={<Iklan />} />
         <Route path="berita/data" element={<NewsData />} />
         <Route path="berita/upload" element={<NewsUpload />} />
+        <Route path="berita/upload/:id" element={<NewsUpload />} />
         <Route path="pengaturan" element={<Settings />} />
       </Route>
 

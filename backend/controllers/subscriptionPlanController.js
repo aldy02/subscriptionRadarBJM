@@ -31,6 +31,10 @@ export const createPlan = async (req, res) => {
   try {
     const { name, duration, price, description } = req.body;
 
+    if (!name || !duration || !price || !description) {
+      return res.status(400).json({ message: "Semua field wajib diisi" });
+    }
+
     const newPlan = await SubscriptionPlan.create({
       name,
       duration,
@@ -44,6 +48,7 @@ export const createPlan = async (req, res) => {
     res.status(500).json({ message: "Gagal menambah paket" });
   }
 };
+
 
 // Update plan
 export const updatePlan = async (req, res) => {

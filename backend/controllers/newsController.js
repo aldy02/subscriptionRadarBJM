@@ -1,6 +1,7 @@
 const News = require("../models/news");
 const fs = require('fs').promises;
 const path = require('path');
+const { Op } = require("sequelize");
 
 // Create
 exports.createNews = async (req, res) => {
@@ -60,18 +61,39 @@ exports.getAllNews = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
     const category = req.query.category;
+    const search = req.query.search || "";
 
     let whereClause = {};
-    if (category && category !== 'all') {
+
+    // Filter category
+    if (category && category !== "all") {
       whereClause.category = category;
     }
 
-    const { count, rows: news } = await News.findAndCountAll({ 
+    // Pencarian di title, content, dan author
+    if (search) {
+      whereClause[Op.or] = [
+        { title: { [Op.like]: `%${search}%` } },
+        { author: { [Op.like]: `%${search}%` } }
+      ];
+    }
+
+    const { count, rows: news } = await News.findAndCountAll({
       where: whereClause,
       order: [["created_at", "DESC"]],
       limit,
       offset,
-      attributes: ['id', 'title', 'category', 'author', 'location', 'photo', 'content', 'created_at', 'updated_at']
+      attributes: [
+        "id",
+        "title",
+        "category",
+        "author",
+        "location",
+        "photo",
+        "content",
+        "created_at",
+        "updated_at"
+      ]
     });
 
     res.json({
@@ -84,7 +106,7 @@ exports.getAllNews = async (req, res) => {
       }
     });
   } catch (err) {
-    console.error('Get all news error:', err);
+    console.error("Get all news error:", err);
     res.status(500).json({ message: "Terjadi kesalahan server" });
   }
 };
