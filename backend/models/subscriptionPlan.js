@@ -1,7 +1,8 @@
-import { DataTypes } from "sequelize";
-import sequelize from "../config/db.js";
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/db");
 
 const SubscriptionPlan = sequelize.define("SubscriptionPlan", {
+  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   name: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -25,4 +26,4 @@ const SubscriptionPlan = sequelize.define("SubscriptionPlan", {
   updatedAt: false,
 });
 
-export default SubscriptionPlan;
+module.exports = SubscriptionPlan;
