@@ -1,6 +1,13 @@
 import User from "../models/user.js";
 import bcrypt from "bcrypt";
 import { Op } from "sequelize";
+import fs from "fs";
+import { fileURLToPath } from "url";
+import path from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 
 // Get all users
 export const getAllUsers = async (req, res) => {
@@ -72,7 +79,8 @@ export const createUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, phone, address, role } = req.body;
+
+    const { name, email, phone, address, role } = req.body
 
     // Check if email already exist
     const existingUser = await User.findOne({
@@ -97,6 +105,75 @@ export const updateUser = async (req, res) => {
     res.status(500).json({ message: "Gagal update user" });
   }
 };
+
+// Controller for setting menu start
+// Update profile (for logged in user)
+export const updateProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const body = req.body || {};
+    const { name, email, phone, address, password, confirmPassword } = body;
+
+    let updateData = {};
+
+    if (name) updateData.name = name;
+    if (email) updateData.email = email;
+    if (phone) updateData.phone = phone;
+    if (address) updateData.address = address;
+
+    // Update password
+    if (password) {
+      if (password !== confirmPassword) {
+        return res.status(400).json({ message: "Konfirmasi password tidak sama!" });
+      }
+      updateData.password = await bcrypt.hash(password, 10);
+    }
+
+    // Kalau ada file baru
+    if (req.file) {
+      // Ambil data user lama
+      const user = await User.findByPk(userId);
+
+      // Hapus foto lama kalau bukan default
+      if (user.profile_photo && user.profile_photo !== "default.jpg") {
+        const oldPath = path.join(__dirname, "../uploads", user.profile_photo);
+        if (fs.existsSync(oldPath)) {
+          fs.unlinkSync(oldPath);
+        }
+      }
+
+      // Simpan foto baru
+      updateData.profile_photo = req.file.filename;
+    }
+
+    await User.update(updateData, { where: { id: userId } });
+
+    res.status(200).json({ message: "Profil berhasil diperbarui" });
+  } catch (error) {
+    console.error("Error updateProfile:", error);
+    res.status(500).json({ message: "Gagal update profil" });
+  }
+};
+
+// Get profile (for logged in user)
+export const getMyProfile = async (req, res) => {
+  try {
+    const userId = req.user.id; // dari JWT
+    const user = await User.findByPk(userId, {
+      attributes: { exclude: ["password"] }, // jangan kirim password
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User tidak ditemukan" });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error getMyProfile:", error);
+    res.status(500).json({ message: "Gagal mengambil profil" });
+  }
+};
+// Controller for setting menu end
 
 // Delete user
 export const deleteUser = async (req, res) => {

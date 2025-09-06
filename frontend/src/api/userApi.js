@@ -21,3 +21,21 @@ export const updateUser = async (id, data) => {
 export const deleteUser = async (id) => {
   return await api.delete(`/users/${id}`);
 };
+
+// Ambil data profil user sendiri
+export const getMyProfile = async (token) => {
+  return api.get("/users/me", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+// Update profil user sendiri
+export const updateMyProfile = async (formData, token) => {
+  return api.put("/users/me", formData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
