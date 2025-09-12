@@ -1,7 +1,9 @@
 import { Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Home from "./pages/Home";
+import Home from "./pages/customer/Home";
+import Advertisement from "./pages/customer/Advertisement";
+import Subscription from "./pages/customer/Subscription";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserData from "./pages/admin/UserData"
 import Koran from "./pages/admin/Koran"
@@ -11,6 +13,7 @@ import NewsUpload from "./pages/admin/NewsUpload"
 import Settings from "./pages/admin/Settings"
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminLayout from "./layouts/AdminLayout";
+import CustomerLayout from "./layouts/CustomerLayout"
 
 function App() {
 
@@ -19,11 +22,17 @@ function App() {
 
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+
+      {/* Customer Routes */}
       <Route path="/" element={
         <ProtectedRoute allowedRoles={["customer", "admin"]}>
-          <Home />
+          <CustomerLayout />
         </ProtectedRoute>
-      } />
+      }>
+        <Route index element={<Home />} />
+        <Route path="subscription" element={<Subscription />} />
+        <Route path="advertisement" element={<Advertisement />} />
+      </Route>
 
       {/* Admin Routes */}
       <Route

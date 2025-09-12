@@ -1,5 +1,5 @@
 const express = require("express");
-const { verifyToken, isAdmin } = require("../middlewares/authMiddleware");
+const { verifyToken, isAdmin } = require("../middleware/authMiddleware");
 const {
   createSubscription,
   getMySubscriptions,

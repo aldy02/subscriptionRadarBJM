@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const transactionController = require("../controllers/transactionController");
 const { uploadPayment } = require("../middleware/uploadMiddleware");
-const { verifyToken, adminOnly } = require("../middleware/authMiddleware");
+const { verifyToken, isAdmin } = require("../middleware/authMiddleware");
 
 // User buat transaksi subscription/advertisement
 router.post(
@@ -19,7 +19,7 @@ router.get("/my", verifyToken, transactionController.getMyTransactions);
 router.put(
   "/validate/:transactionId",
   verifyToken,
-  adminOnly,
+  isAdmin,
   transactionController.validateTransaction
 );
 

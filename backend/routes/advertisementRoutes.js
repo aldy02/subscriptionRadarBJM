@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const advertisementController = require("../controllers/advertisementController");
-const { verifyToken, adminOnly } = require("../middleware/authMiddleware");
+const { verifyToken, isAdmin } = require("../middleware/authMiddleware");
 
 // Ambil semua paket iklan
 router.get("/packages", advertisementController.getAllPackages);
@@ -13,7 +13,7 @@ router.get("/packages/:id", advertisementController.getPackageById);
 router.get("/active", advertisementController.getActiveAds);
 
 // Tambah paket iklan (admin only)
-router.post("/packages", verifyToken, adminOnly, async (req, res) => {
+router.post("/packages", verifyToken, isAdmin, async (req, res) => {
   try {
     const { name, description, size, price } = req.body;
     const Advertisement = require("../models/advertisement");
