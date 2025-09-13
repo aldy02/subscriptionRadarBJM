@@ -19,8 +19,4 @@ const UserSubscription = sequelize.define(
   }
 );
 
-// Relasi
-UserSubscription.belongsTo(User, { foreignKey: "user_id" });
-UserSubscription.belongsTo(SubscriptionPlan, { foreignKey: "subscription_plan_id" });
-
 module.exports = UserSubscription;

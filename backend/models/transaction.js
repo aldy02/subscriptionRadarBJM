@@ -23,6 +23,4 @@ const Transaction = sequelize.define(
   }
 );
 
-Transaction.belongsTo(User, { foreignKey: "user_id" });
-
 module.exports = Transaction;

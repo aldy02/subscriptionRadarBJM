@@ -75,9 +75,9 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Hero Section - Left aligned */}
         <div className="mb-12">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">Latest News</h2>
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">Berita Terbaru</h2>
           <p className="text-xl text-gray-600 max-w-3xl">
-            Stay updated with the latest developments in business and technology
+            Tetap update dengan informasi perkembangan dan tren terbaru.
           </p>
         </div>
 
@@ -218,7 +218,7 @@ export default function Home() {
               onClick={() => setShowAll(!showAll)}
               className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
             >
-              {showAll ? "Show Less" : "View All Articles"}
+              {showAll ? "Tampilkan Lebih Sedikit" : "Lihat Semua Berita"}
             </button>
           </div>
         )}
