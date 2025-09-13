@@ -39,7 +39,7 @@ export default function Home() {
   };
 
   const handleReadMore = (newsId) => {
-    navigate(`/news/${newsId}`);
+    navigate(`/${newsId}`);
   };
 
   const calculateReadTime = (content) => {

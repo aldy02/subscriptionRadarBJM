@@ -12,7 +12,7 @@ export default function Navigation() {
   };
 
   return (
-    <nav className="bg-white shadow-md px-12 py-3 flex items-center justify-between">
+    <nav className="bg-white border-b border-gray-200 shadow-sm px-12 py-3 flex items-center justify-between">
       {/* Left: Logo */}
       <div className="text-xl font-bold text-blue-600">Radar Banjarmasin</div>
 

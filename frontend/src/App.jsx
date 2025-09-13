@@ -14,6 +14,7 @@ import Settings from "./pages/admin/Settings"
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminLayout from "./layouts/AdminLayout";
 import CustomerLayout from "./layouts/CustomerLayout"
+import NewsDetail from "./pages/customer/NewsDetail"
 
 function App() {
 
@@ -30,6 +31,7 @@ function App() {
         </ProtectedRoute>
       }>
         <Route index element={<Home />} />
+        <Route path="/:newsId" element={<NewsDetail />} />
         <Route path="subscription" element={<Subscription />} />
         <Route path="advertisement" element={<Advertisement />} />
       </Route>
