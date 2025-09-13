@@ -7,7 +7,6 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const subscriptionPlanRoutes = require("./routes/subscriptionPlanRoutes")
 const newsRoutes = require("./routes/newsRoutes");
-const transactionRoutes = require("./routes/transactionRoutes");
 const advertisementRoutes = require("./routes/advertisementRoutes");
 const subscriptionRoutes = require("./routes/subscriptionRoutes"); 
 
@@ -26,7 +25,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/subscription-plans", subscriptionPlanRoutes);
 app.use("/api/news", newsRoutes);
-app.use("/api/transactions", transactionRoutes);
 app.use("/api/advertisements", advertisementRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
 
