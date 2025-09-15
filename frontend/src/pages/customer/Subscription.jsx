@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import { getPlans } from "../../api/subscriptionPlanApi";
+import { createSubscriptionTransaction } from "../../api/transactionApi";
 
 export default function Subscription() {
   const [plans, setPlans] = useState([]);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState("");
   const [proofFile, setProofFile] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const paymentMethods = [
     { id: "bca", name: "BCA - 098877887", account: "098877887", owner: "Aldy Rahman" },
@@ -34,13 +35,11 @@ export default function Subscription() {
 
   const handleBuy = (plan) => {
     setSelectedPlan(plan);
-    setStep(1);
     setShowModal(true);
   };
 
   const closeModal = () => {
     setShowModal(false);
-    setStep(1);
     setSelectedPlan(null);
     setPaymentMethod("");
     setProofFile(null);
@@ -50,6 +49,38 @@ export default function Subscription() {
     navigator.clipboard.writeText(account);
     alert("Account number copied!");
   };
+
+  const handleSubmitPayment = async () => {
+  if (!paymentMethod) {
+    alert("Please select a payment method!");
+    return;
+  }
+  if (!proofFile) {
+    alert("Please upload payment proof!");
+    return;
+  }
+
+  try {
+    setSubmitting(true);
+
+    const formData = new FormData();
+    formData.append("package_id", selectedPlan.id);
+    formData.append("payment_method", paymentMethod);
+    formData.append("proof_payment", proofFile);
+
+    const result = await createSubscriptionTransaction(formData);
+
+    alert(
+      `Payment submitted successfully! Invoice: ${result.data.invoice_number}. We will verify your payment within 24 hours.`
+    );
+    closeModal();
+  } catch (error) {
+    console.error("Submit payment error:", error);
+    alert(error.message || "An error occurred while submitting payment");
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
@@ -372,25 +403,16 @@ export default function Subscription() {
               <button
                 onClick={closeModal}
                 className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors"
+                disabled={submitting}
               >
                 Cancel
               </button>
               <button
-                onClick={() => {
-                  if (!paymentMethod) {
-                    alert("Please select a payment method!");
-                    return;
-                  }
-                  if (!proofFile) {
-                    alert("Please upload payment proof!");
-                    return;
-                  }
-                  alert("Payment submitted successfully! We will verify your payment within 24 hours.");
-                  closeModal();
-                }}
-                className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                onClick={handleSubmitPayment}
+                disabled={submitting}
+                className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Submit Payment
+                {submitting ? 'Submitting...' : 'Submit Payment'}
               </button>
             </div>
           </div>

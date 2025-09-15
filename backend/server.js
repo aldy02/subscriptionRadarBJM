@@ -8,6 +8,7 @@ const userRoutes = require("./routes/userRoutes");
 const subscriptionPlanRoutes = require("./routes/subscriptionPlanRoutes")
 const newsRoutes = require("./routes/newsRoutes");
 const subscriptionRoutes = require("./routes/subscriptionRoutes"); 
+const transactionRoutes = require("./routes/transactionRoutes")
 
 dotenv.config();
 const app = express();
@@ -25,6 +26,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/subscription-plans", subscriptionPlanRoutes);
 app.use("/api/news", newsRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
+app.use("/api/transactions", transactionRoutes); 
 
 // Test Database Connection
 sequelize.authenticate()

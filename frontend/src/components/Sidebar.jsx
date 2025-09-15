@@ -9,6 +9,7 @@ import {
   Settings,
   LogOut,
   ChevronDown,
+  Wallet,
 } from "lucide-react";
 
 const menuItems = [
@@ -24,6 +25,7 @@ const menuItems = [
       { name: "Upload Berita", path: "/admin/berita/upload" },
     ],
   },
+   { name: "Transaksi", icon: Wallet, path: "/admin/transaksi" },
 ];
 
 export default function Sidebar() {

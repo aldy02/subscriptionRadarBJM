@@ -53,12 +53,12 @@ export default function Navigation() {
             <button
               onClick={() => {
                 setOpen(false);
-                navigate("/purchase-history");
+                navigate("/transaction-history");
               }}
               className="flex items-center gap-2 w-full px-4 py-2 text-gray-700 hover:bg-gray-100"
             >
               <ShoppingBag className="h-4 w-4" />
-              Purchase History
+              Transaction History
             </button>
             <button
               onClick={() => {

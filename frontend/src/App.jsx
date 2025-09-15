@@ -15,6 +15,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AdminLayout from "./layouts/AdminLayout";
 import CustomerLayout from "./layouts/CustomerLayout"
 import NewsDetail from "./pages/customer/NewsDetail"
+import AdminTransactions from "./pages/admin/AdminTransactions"
+import TransactionHistory from "./pages/customer/TransactionHistory";
 
 function App() {
 
@@ -34,6 +36,7 @@ function App() {
         <Route path="/:newsId" element={<NewsDetail />} />
         <Route path="subscription" element={<Subscription />} />
         <Route path="advertisement" element={<Advertisement />} />
+        <Route path="transaction-history" element={<TransactionHistory />} />
       </Route>
 
       {/* Admin Routes */}
@@ -53,6 +56,7 @@ function App() {
         <Route path="berita/data" element={<NewsData />} />
         <Route path="berita/upload" element={<NewsUpload />} />
         <Route path="berita/upload/:id" element={<NewsUpload />} />
+        <Route path="transaksi" element={<AdminTransactions />} />
         <Route path="pengaturan" element={<Settings />} />
       </Route>
 
