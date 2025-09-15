@@ -78,16 +78,20 @@ exports.getUserTransactions = async (req, res) => {
   try {
     const user_id = req.user.id;
 
-    const transactions = await Transaction.findAll({
-      where: { user_id },
-      include: [
-        {
-          model: User,
-          attributes: ['id', 'name', 'email']
-        }
-      ],
-      order: [['created_at', 'DESC']]
-    });
+const transactions = await Transaction.findAll({
+  where: { user_id },
+  include: [
+    {
+      model: User,
+      attributes: ['id', 'name', 'email']
+    },
+    {
+      model: SubscriptionPlan,
+      attributes: ['id', 'name', 'price', 'duration']
+    }
+  ],
+  order: [['created_at', 'DESC']]
+});
 
     res.json({
       success: true,
@@ -109,18 +113,19 @@ exports.getTransactionByInvoice = async (req, res) => {
     const { invoice_number } = req.params;
     const user_id = req.user.id;
 
-    const transaction = await Transaction.findOne({
-      where: { 
-        invoice_number,
-        user_id 
-      },
-      include: [
-        {
-          model: User,
-          attributes: ['id', 'name', 'email']
-        }
-      ]
-    });
+   const transaction = await Transaction.findOne({
+  where: { invoice_number, user_id },
+  include: [
+    {
+      model: User,
+      attributes: ['id', 'name', 'email']
+    },
+    {
+      model: SubscriptionPlan,
+      attributes: ['id', 'name', 'price', 'duration']
+    }
+  ]
+});
 
     if (!transaction) {
       return res.status(404).json({ 
@@ -155,18 +160,23 @@ exports.getAllTransactions = async (req, res) => {
 
     const offset = (page - 1) * limit;
 
-    const { count, rows: transactions } = await Transaction.findAndCountAll({
-      where,
-      include: [
-        {
-          model: User,
-          attributes: ['id', 'name', 'email']
-        }
-      ],
-      limit: parseInt(limit),
-      offset,
-      order: [['created_at', 'DESC']]
-    });
+const { count, rows: transactions } = await Transaction.findAndCountAll({
+  where,
+  include: [
+    {
+      model: User,
+      attributes: ['id', 'name', 'email']
+    },
+    {
+      model: SubscriptionPlan,
+      attributes: ['id', 'name', 'price', 'duration']
+    }
+  ],
+  limit: parseInt(limit),
+  offset,
+  order: [['created_at', 'DESC']]
+});
+
 
     res.json({
       success: true,
