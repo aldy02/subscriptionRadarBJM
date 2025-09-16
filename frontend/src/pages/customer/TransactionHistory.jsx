@@ -53,6 +53,14 @@ export default function TransactionHistory() {
     });
   };
 
+  const formatDateOnly = (dateString) => {
+    return new Date(dateString).toLocaleDateString('id-ID', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('id-ID', {
       style: 'currency',
@@ -61,117 +69,128 @@ export default function TransactionHistory() {
   };
 
   const printInvoice = (transaction) => {
-  const printWindow = window.open("", "_blank");
+    const printWindow = window.open("", "_blank");
 
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Invoice ${transaction.invoice_number}</title>
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-          line-height: 1.6;
-          margin: 0;
-          padding: 20px;
-          color: #333;
-        }
-        .header {
-          text-align: center;
-          margin-bottom: 30px;
-          border-bottom: 2px solid #333;
-          padding-bottom: 20px;
-        }
-        .invoice-details {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 20px;
-          margin-bottom: 30px;
-        }
-        .detail-section {
-          border: 1px solid #ddd;
-          padding: 15px;
-          border-radius: 5px;
-        }
-        .detail-section h3 {
-          margin-top: 0;
-          color: #2563eb;
-        }
-        .status-badge {
-          display: inline-block;
-          padding: 5px 12px;
-          border-radius: 20px;
-          font-size: 12px;
-          font-weight: bold;
-          text-transform: uppercase;
-        }
-        .status-pending { background-color: #fef3cd; color: #8a6d3b; }
-        .status-accepted { background-color: #d4edda; color: #155724; }
-        .status-rejected { background-color: #f8d7da; color: #721c24; }
-        .payment-info {
-          margin-top: 20px;
-          padding: 15px;
-          background-color: #f8f9fa;
-          border-radius: 5px;
-        }
-        @media print {
-          body { margin: 0; }
-          .no-print { display: none; }
-        }
-      </style>
-    </head>
-    <body>
-      <div class="header">
-        <h1>INVOICE</h1>
-        <h2>${transaction.invoice_number}</h2>
-        <p>Tanggal: ${new Date(transaction.created_at).toLocaleString("id-ID")}</p>
-      </div>
-
-      <div class="invoice-details">
-        <div class="detail-section">
-          <h3>Informasi Transaksi</h3>
-          <p><strong>Paket:</strong> ${transaction.SubscriptionPlan?.name || "N/A"}</p>
-          <p><strong>Type:</strong> ${transaction.type}</p>
-          <p><strong>Status:</strong> 
-            <span class="status-badge status-${transaction.status}">${transaction.status}</span>
-          </p>
-          <p><strong>Metode Pembayaran:</strong> ${transaction.payment_method.toUpperCase()}</p>
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html lang="id">
+      <head>
+        <meta charset="UTF-8">
+        <title>Invoice ${transaction.invoice_number}</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+          }
+          .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+          }
+          .invoice-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+          }
+          .detail-section {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+          }
+          .detail-section h3 {
+            margin-top: 0;
+            color: #2563eb;
+          }
+          .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+          }
+          .status-pending { background-color: #fef3cd; color: #8a6d3b; }
+          .status-accepted { background-color: #d4edda; color: #155724; }
+          .status-rejected { background-color: #f8d7da; color: #721c24; }
+          .subscription-period {
+            background-color: #e3f2fd;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+          }
+          .payment-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+          }
+          @media print {
+            body { margin: 0; }
+            .no-print { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>INVOICE</h1>
+          <h2>${transaction.invoice_number}</h2>
+          <p>Tanggal: ${new Date(transaction.created_at).toLocaleString("id-ID")}</p>
         </div>
 
-        <div class="detail-section">
-          <h3>Detail Pembayaran</h3>
-          <p><strong>Total Harga:</strong></p>
-          <h2 style="color: #2563eb; margin: 10px 0;">Rp${transaction.total_price.toLocaleString("id-ID")}</h2>
-          ${transaction.admin_notes ? `<p><strong>Catatan Admin:</strong> ${transaction.admin_notes}</p>` : ""}
+        <div class="invoice-details">
+          <div class="detail-section">
+            <h3>Informasi Transaksi</h3>
+            <p><strong>Paket:</strong> ${transaction.SubscriptionPlan?.name || "N/A"}</p>
+            <p><strong>Type:</strong> ${transaction.type}</p>
+            <p><strong>Status:</strong> 
+              <span class="status-badge status-${transaction.status}">${transaction.status}</span>
+            </p>
+            <p><strong>Metode Pembayaran:</strong> ${transaction.payment_method.toUpperCase()}</p>
+            ${transaction.UserSubscription ? `
+              <div class="subscription-period">
+                <p><strong>Masa Aktif Langganan:</strong></p>
+                <p>${new Date(transaction.UserSubscription.start_date).toLocaleDateString("id-ID")} s/d ${new Date(transaction.UserSubscription.end_date).toLocaleDateString("id-ID")}</p>
+              </div>
+            ` : ""}
+          </div>
+
+          <div class="detail-section">
+            <h3>Detail Pembayaran</h3>
+            <p><strong>Total Harga:</strong></p>
+            <h2 style="color: #2563eb; margin: 10px 0;">Rp${transaction.total_price.toLocaleString("id-ID")}</h2>
+            ${transaction.admin_notes ? `<p><strong>Catatan Admin:</strong> ${transaction.admin_notes}</p>` : ""}
+          </div>
         </div>
-      </div>
 
-      ${transaction.proof_payment ? `
-        <div class="payment-info">
-          <h3>Bukti Pembayaran</h3>
-          <p><strong>File:</strong> ${transaction.proof_payment}</p>
+        ${transaction.proof_payment ? `
+          <div class="payment-info">
+            <h3>Bukti Pembayaran</h3>
+            <p><strong>File:</strong> ${transaction.proof_payment}</p>
+          </div>
+        ` : ""}
+
+        <div style="margin-top: 40px; text-align: center; font-size: 12px; color: #666;">
+          <p>Terima kasih atas kepercayaan Anda</p>
+          <p>Dicetak pada: ${new Date().toLocaleString("id-ID")}</p>
         </div>
-      ` : ""}
+      </body>
+      </html>
+    `;
 
-      <div style="margin-top: 40px; text-align: center; font-size: 12px; color: #666;">
-        <p>Terima kasih atas kepercayaan Anda</p>
-        <p>Dicetak pada: ${new Date().toLocaleString("id-ID")}</p>
-      </div>
-    </body>
-    </html>
-  `;
+    printWindow.document.open();
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
 
-  // langsung isi body window baru
-  printWindow.document.open();
-  printWindow.document.write(htmlContent);
-  printWindow.document.close();
-
-  // tunggu selesai render, baru print
-  printWindow.onload = () => {
-    printWindow.focus();
-    printWindow.print();
+    printWindow.onload = () => {
+      printWindow.focus();
+      printWindow.print();
+    };
   };
-};
 
   if (loading) {
     return (
@@ -258,9 +277,33 @@ export default function TransactionHistory() {
                     </div>
                   </div>
 
+                  {/* Subscription Period Info - Menampilkan masa aktif jika ada */}
+                  {transaction.UserSubscription && (
+                    <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="flex items-center mb-2">
+                        <svg className="w-5 h-5 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                        </svg>
+                        <p className="text-sm font-medium text-blue-800">Masa Aktif Langganan</p>
+                      </div>
+                      <p className="text-sm text-blue-700">
+                        <span className="font-semibold">Mulai:</span> {formatDateOnly(transaction.UserSubscription.start_date)}
+                      </p>
+                      <p className="text-sm text-blue-700">
+                        <span className="font-semibold">Berakhir:</span> {formatDateOnly(transaction.UserSubscription.end_date)}
+                      </p>
+                      <p className="text-xs text-blue-600 mt-1">
+                        Status: {transaction.UserSubscription.is_active ? 
+                          <span className="font-medium text-green-600">Aktif</span> : 
+                          <span className="font-medium text-red-600">Tidak Aktif</span>
+                        }
+                      </p>
+                    </div>
+                  )}
+
                   {/* Payment Proof */}
                   {transaction.proof_payment && (
-                    <div className="border-t pt-4">
+                    <div className="border-t pt-4 mb-4">
                       <p className="text-sm font-medium text-gray-700 mb-2">Payment Proof</p>
                       <div className="flex items-center space-x-3">
                         <div className="flex-shrink-0">

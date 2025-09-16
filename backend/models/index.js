@@ -15,6 +15,9 @@ Transaction.belongsTo(User, { foreignKey: "user_id" });
 Transaction.belongsTo(SubscriptionPlan, { foreignKey: "package_id" });
 Transaction.belongsTo(Advertisement, { foreignKey: "package_id" });
 
+// 🔥 Tambahkan relasi ini
+Transaction.hasOne(UserSubscription, { foreignKey: "transaction_id" });
+UserSubscription.belongsTo(Transaction, { foreignKey: "transaction_id" });
 
 module.exports = {
   Transaction,

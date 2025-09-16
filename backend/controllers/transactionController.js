@@ -1,4 +1,4 @@
-const { Transaction, SubscriptionPlan, User } = require("../models");
+const { Transaction, SubscriptionPlan, User, UserSubscription } = require("../models");
 const { uploadPayment } = require("../middleware/uploadMiddleware");
 
 // Generate Invoice Number
@@ -19,23 +19,23 @@ exports.createSubscriptionTransaction = async (req, res) => {
 
     // Validasi input
     if (!package_id || !payment_method) {
-      return res.status(400).json({ 
-        message: "Package ID dan payment method harus diisi" 
+      return res.status(400).json({
+        message: "Package ID dan payment method harus diisi"
       });
     }
 
     // Cek apakah file proof payment ada
     if (!req.file) {
-      return res.status(400).json({ 
-        message: "Bukti pembayaran harus diupload" 
+      return res.status(400).json({
+        message: "Bukti pembayaran harus diupload"
       });
     }
 
     // Ambil data subscription plan
     const subscriptionPlan = await SubscriptionPlan.findByPk(package_id);
     if (!subscriptionPlan) {
-      return res.status(404).json({ 
-        message: "Subscription plan tidak ditemukan" 
+      return res.status(404).json({
+        message: "Subscription plan tidak ditemukan"
       });
     }
 
@@ -66,9 +66,9 @@ exports.createSubscriptionTransaction = async (req, res) => {
 
   } catch (error) {
     console.error("Create transaction error:", error);
-    res.status(500).json({ 
-      message: "Terjadi kesalahan server", 
-      error: error.message 
+    res.status(500).json({
+      message: "Terjadi kesalahan server",
+      error: error.message
     });
   }
 };
@@ -78,20 +78,25 @@ exports.getUserTransactions = async (req, res) => {
   try {
     const user_id = req.user.id;
 
-const transactions = await Transaction.findAll({
-  where: { user_id },
-  include: [
-    {
-      model: User,
-      attributes: ['id', 'name', 'email']
-    },
-    {
-      model: SubscriptionPlan,
-      attributes: ['id', 'name', 'price', 'duration']
-    }
-  ],
-  order: [['created_at', 'DESC']]
-});
+    const transactions = await Transaction.findAll({
+      where: { user_id },
+      include: [
+        {
+          model: User,
+          attributes: ['id', 'name', 'email']
+        },
+        {
+          model: SubscriptionPlan,
+          attributes: ['id', 'name', 'price', 'duration']
+        },
+        {
+          model: UserSubscription,
+          attributes: ['start_date', 'end_date', 'is_active'], 
+          required: false
+        }
+      ],
+      order: [['created_at', 'DESC']]
+    });
 
     res.json({
       success: true,
@@ -100,9 +105,9 @@ const transactions = await Transaction.findAll({
 
   } catch (error) {
     console.error("Get user transactions error:", error);
-    res.status(500).json({ 
-      message: "Terjadi kesalahan server", 
-      error: error.message 
+    res.status(500).json({
+      message: "Terjadi kesalahan server",
+      error: error.message
     });
   }
 };
@@ -113,23 +118,23 @@ exports.getTransactionByInvoice = async (req, res) => {
     const { invoice_number } = req.params;
     const user_id = req.user.id;
 
-   const transaction = await Transaction.findOne({
-  where: { invoice_number, user_id },
-  include: [
-    {
-      model: User,
-      attributes: ['id', 'name', 'email']
-    },
-    {
-      model: SubscriptionPlan,
-      attributes: ['id', 'name', 'price', 'duration']
-    }
-  ]
-});
+    const transaction = await Transaction.findOne({
+      where: { invoice_number, user_id },
+      include: [
+        {
+          model: User,
+          attributes: ['id', 'name', 'email']
+        },
+        {
+          model: SubscriptionPlan,
+          attributes: ['id', 'name', 'price', 'duration']
+        }
+      ]
+    });
 
     if (!transaction) {
-      return res.status(404).json({ 
-        message: "Transaksi tidak ditemukan" 
+      return res.status(404).json({
+        message: "Transaksi tidak ditemukan"
       });
     }
 
@@ -140,9 +145,9 @@ exports.getTransactionByInvoice = async (req, res) => {
 
   } catch (error) {
     console.error("Get transaction error:", error);
-    res.status(500).json({ 
-      message: "Terjadi kesalahan server", 
-      error: error.message 
+    res.status(500).json({
+      message: "Terjadi kesalahan server",
+      error: error.message
     });
   }
 };
@@ -153,29 +158,29 @@ exports.getTransactionByInvoice = async (req, res) => {
 exports.getAllTransactions = async (req, res) => {
   try {
     const { status, type, page = 1, limit = 10 } = req.query;
-    
+
     const where = {};
     if (status) where.status = status;
     if (type) where.type = type;
 
     const offset = (page - 1) * limit;
 
-const { count, rows: transactions } = await Transaction.findAndCountAll({
-  where,
-  include: [
-    {
-      model: User,
-      attributes: ['id', 'name', 'email']
-    },
-    {
-      model: SubscriptionPlan,
-      attributes: ['id', 'name', 'price', 'duration']
-    }
-  ],
-  limit: parseInt(limit),
-  offset,
-  order: [['created_at', 'DESC']]
-});
+    const { count, rows: transactions } = await Transaction.findAndCountAll({
+      where,
+      include: [
+        {
+          model: User,
+          attributes: ['id', 'name', 'email']
+        },
+        {
+          model: SubscriptionPlan,
+          attributes: ['id', 'name', 'price', 'duration']
+        }
+      ],
+      limit: parseInt(limit),
+      offset,
+      order: [['created_at', 'DESC']]
+    });
 
 
     res.json({
@@ -191,9 +196,9 @@ const { count, rows: transactions } = await Transaction.findAndCountAll({
 
   } catch (error) {
     console.error("Get all transactions error:", error);
-    res.status(500).json({ 
-      message: "Terjadi kesalahan server", 
-      error: error.message 
+    res.status(500).json({
+      message: "Terjadi kesalahan server",
+      error: error.message
     });
   }
 };
@@ -206,15 +211,15 @@ exports.updateTransactionStatus = async (req, res) => {
 
     // Validasi status
     if (!['pending', 'accepted', 'rejected'].includes(status)) {
-      return res.status(400).json({ 
-        message: "Status tidak valid" 
+      return res.status(400).json({
+        message: "Status tidak valid"
       });
     }
 
     const transaction = await Transaction.findByPk(id);
     if (!transaction) {
-      return res.status(404).json({ 
-        message: "Transaksi tidak ditemukan" 
+      return res.status(404).json({
+        message: "Transaksi tidak ditemukan"
       });
     }
 
@@ -228,7 +233,7 @@ exports.updateTransactionStatus = async (req, res) => {
     // Jika status accepted dan type subscription, buat user subscription
     if (status === 'accepted' && transaction.type === 'subscription') {
       const { UserSubscription, SubscriptionPlan } = require("../models");
-      
+
       const plan = await SubscriptionPlan.findByPk(transaction.package_id);
       if (plan) {
         const startDate = new Date();
@@ -238,6 +243,7 @@ exports.updateTransactionStatus = async (req, res) => {
         await UserSubscription.create({
           user_id: transaction.user_id,
           subscription_plan_id: transaction.package_id,
+          transaction_id: transaction.id,
           start_date: startDate,
           end_date: endDate,
           is_active: true
@@ -253,9 +259,9 @@ exports.updateTransactionStatus = async (req, res) => {
 
   } catch (error) {
     console.error("Update transaction status error:", error);
-    res.status(500).json({ 
-      message: "Terjadi kesalahan server", 
-      error: error.message 
+    res.status(500).json({
+      message: "Terjadi kesalahan server",
+      error: error.message
     });
   }
 };
@@ -264,7 +270,7 @@ exports.updateTransactionStatus = async (req, res) => {
 exports.getTransactionStats = async (req, res) => {
   try {
     const { Op } = require('sequelize');
-    
+
     // Total transactions by status
     const statusStats = await Transaction.findAll({
       attributes: [
@@ -317,9 +323,9 @@ exports.getTransactionStats = async (req, res) => {
 
   } catch (error) {
     console.error("Get transaction stats error:", error);
-    res.status(500).json({ 
-      message: "Terjadi kesalahan server", 
-      error: error.message 
+    res.status(500).json({
+      message: "Terjadi kesalahan server",
+      error: error.message
     });
   }
 };

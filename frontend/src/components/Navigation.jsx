@@ -43,12 +43,12 @@ export default function Navigation() {
             <button
               onClick={() => {
                 setOpen(false);
-                navigate("/account-settings");
+                navigate("/pengaturan-akun");
               }}
               className="flex items-center gap-2 w-full px-4 py-2 text-gray-700 hover:bg-gray-100"
             >
               <Settings className="h-4 w-4" />
-              Account Settings
+              Pengaturan Akun
             </button>
             <button
               onClick={() => {
@@ -58,7 +58,7 @@ export default function Navigation() {
               className="flex items-center gap-2 w-full px-4 py-2 text-gray-700 hover:bg-gray-100"
             >
               <ShoppingBag className="h-4 w-4" />
-              Transaction History
+              Riwayat Transaksi
             </button>
             <button
               onClick={() => {
