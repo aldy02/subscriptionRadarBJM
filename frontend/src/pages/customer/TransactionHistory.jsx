@@ -194,12 +194,10 @@ export default function TransactionHistory() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12 px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading riwayat transaksi...</p>
-          </div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading riwayat transaksi...</p>
         </div>
       </div>
     );
@@ -228,13 +226,13 @@ export default function TransactionHistory() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-1">No Transactions Found</h3>
-            <p className="text-gray-500 mb-6">You haven't made any subscription purchases yet.</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-1">Belum ada data transaksi</h3>
+            <p className="text-gray-500 mb-6">Anda belum pernah melakukan transaksi apapun</p>
             <a
               href="/subscription"
               className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
-              Browse Subscription Plans
+              Lakukan Pembelian Sekarang
             </a>
           </div>
         ) : (
@@ -293,8 +291,8 @@ export default function TransactionHistory() {
                         <span className="font-semibold">Berakhir:</span> {formatDateOnly(transaction.UserSubscription.end_date)}
                       </p>
                       <p className="text-xs text-blue-600 mt-1">
-                        Status: {transaction.UserSubscription.is_active ? 
-                          <span className="font-medium text-green-600">Aktif</span> : 
+                        Status: {transaction.UserSubscription.is_active ?
+                          <span className="font-medium text-green-600">Aktif</span> :
                           <span className="font-medium text-red-600">Tidak Aktif</span>
                         }
                       </p>

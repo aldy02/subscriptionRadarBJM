@@ -25,8 +25,7 @@ export default function Home() {
       setNews(newsData);
       setError(null);
     } catch (err) {
-      console.error("Error fetching news:", err);
-      setError("Failed to load news. Please try again.");
+      setError("Gagal memuat berita. Silahkan coba lagi!");
       setNews([]);
     } finally {
       setLoading(false);
@@ -60,7 +59,7 @@ export default function Home() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading latest news...</p>
+          <p className="mt-4 text-gray-600">Loading berita terbaru...</p>
         </div>
       </div>
     );
@@ -89,7 +88,7 @@ export default function Home() {
               onClick={fetchLatestNews}
               className="mt-2 text-red-600 hover:text-red-800 font-medium"
             >
-              Try again
+              Coba lagi
             </button>
           </div>
         )}

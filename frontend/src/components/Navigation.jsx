@@ -43,7 +43,7 @@ export default function Navigation() {
             <button
               onClick={() => {
                 setOpen(false);
-                navigate("/pengaturan-akun");
+                navigate("/pengaturan");
               }}
               className="flex items-center gap-2 w-full px-4 py-2 text-gray-700 hover:bg-gray-100"
             >

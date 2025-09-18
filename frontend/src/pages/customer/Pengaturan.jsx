@@ -3,7 +3,7 @@ import { Save, Edit3 } from "lucide-react";
 import { getMyProfile, updateMyProfile } from "../../api/userApi";
 import ResultModal from "../../components/ResultModal";
 
-export default function Settings() {
+export default function Pengaturan() {
   const [form, setForm] = useState({
     name: "",
     email: "",

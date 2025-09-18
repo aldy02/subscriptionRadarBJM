@@ -270,7 +270,7 @@ export default function Subscription() {
                     onClick={() => handleBuy(plan)}
                     className="w-full py-2 px-6 rounded-xl font-semibold transition-colors bg-gray-900 text-white hover:bg-gray-800"
                   >
-                    Buy Package
+                    Beli Paket
                   </button>
                 </div>
               </div>

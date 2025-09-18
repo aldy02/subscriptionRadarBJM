@@ -17,6 +17,7 @@ import CustomerLayout from "./layouts/CustomerLayout"
 import NewsDetail from "./pages/customer/NewsDetail"
 import AdminTransactions from "./pages/admin/AdminTransactions"
 import TransactionHistory from "./pages/customer/TransactionHistory";
+import Pengaturan from "./pages/customer/Pengaturan";
 
 function App() {
 
@@ -37,6 +38,7 @@ function App() {
         <Route path="subscription" element={<Subscription />} />
         <Route path="advertisement" element={<Advertisement />} />
         <Route path="transaction-history" element={<TransactionHistory />} />
+        <Route path="pengaturan" element={<Pengaturan />} />
       </Route>
 
       {/* Admin Routes */}
