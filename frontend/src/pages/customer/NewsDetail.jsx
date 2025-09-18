@@ -78,7 +78,7 @@ export default function NewsDetail() {
                     className="flex items-center text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors"
                 >
                     <ArrowLeft className="w-4 h-4 mr-1" />
-                    Back to News
+                    Kembali
                 </button>
             </div>
 

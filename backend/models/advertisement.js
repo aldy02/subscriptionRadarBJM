@@ -6,7 +6,6 @@ const Advertisement = sequelize.define(
   {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     name: { type: DataTypes.STRING(100), allowNull: false },
-    description: { type: DataTypes.TEXT, allowNull: true },
     size: { type: DataTypes.STRING(50), allowNull: false },
     price: { type: DataTypes.INTEGER, allowNull: false },
     created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },

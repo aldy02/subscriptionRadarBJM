@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { getPlans, createPlan, updatePlan, deletePlan } from "../../api/subscriptionPlanApi";
-import { Plus, Edit2, Trash2, Search, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
+import { Plus, Edit2, Trash2, Search } from "lucide-react";
+import DeleteModal from "../../components/DeleteModal";
+import ResultModal from "../../components/ResultModal";
 
 export default function Koran() {
   const [plans, setPlans] = useState([]);
@@ -20,6 +22,7 @@ export default function Koran() {
   // State modal delete
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [planToDelete, setPlanToDelete] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // State modal success/error
   const [isResultOpen, setIsResultOpen] = useState(false);
@@ -34,6 +37,7 @@ export default function Koran() {
       setPlans(response.data);
     } catch (error) {
       console.error("Gagal mengambil data paket:", error);
+      showResult('error', 'Gagal mengambil data paket');
     } finally {
       setLoading(false);
     }
@@ -71,7 +75,8 @@ export default function Koran() {
       setEditingPlan(null);
       fetchPlans();
     } catch (error) {
-      showResult('error', error.response?.data?.message || 'Gagal menyimpan paket');
+      const errorMsg = error.response?.data?.message || 'Gagal menyimpan paket';
+      showResult('error', errorMsg);
     }
   };
 
@@ -82,6 +87,7 @@ export default function Koran() {
   };
 
   const confirmDelete = async () => {
+    setDeleteLoading(true);
     try {
       await deletePlan(planToDelete.id);
       showResult('success', 'Paket berhasil dihapus');
@@ -89,8 +95,10 @@ export default function Koran() {
       setIsDeleteOpen(false);
       setPlanToDelete(null);
     } catch (error) {
-      showResult('error', 'Gagal menghapus paket');
-      setIsDeleteOpen(false);
+      const errorMsg = error.response?.data?.message || 'Gagal menghapus paket';
+      showResult('error', errorMsg);
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -362,106 +370,26 @@ export default function Koran() {
       )}
 
       {/* Modal Delete Confirmation */}
-      {isDeleteOpen && planToDelete && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl p-0 w-full max-w-md overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200">
-            {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-red-50 to-pink-50">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-red-100 rounded-full">
-                  <AlertTriangle className="w-6 h-6 text-red-600" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900">Konfirmasi Hapus</h2>
-                  <p className="text-sm text-gray-600 mt-1">Tindakan ini tidak dapat dibatalkan</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Modal Body */}
-            <div className="px-6 py-6">
-              <div className="text-center">
-                <p className="text-gray-700 mb-2">
-                  Apakah Anda yakin ingin menghapus paket:
-                </p>
-                <p className="font-semibold text-gray-900 text-lg mb-1">
-                  {planToDelete.name}
-                </p>
-                <p className="text-gray-500 text-sm mb-4">
-                  Durasi: {planToDelete.duration} hari - Rp {planToDelete.price?.toLocaleString('id-ID')}
-                </p>
-                <p className="text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-200">
-                  Data yang sudah dihapus tidak dapat dikembalikan!
-                </p>
-              </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
-              <button
-                onClick={() => {
-                  setIsDeleteOpen(false);
-                  setPlanToDelete(null);
-                }}
-                className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm"
-              >
-                Batal
-              </button>
-              <button
-                onClick={confirmDelete}
-                className="px-6 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-              >
-                Ya, Hapus
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeleteModal
+        isOpen={isDeleteOpen}
+        title="Konfirmasi Hapus Paket"
+        itemName={planToDelete?.name}
+        itemDetails={planToDelete ? `Durasi: ${planToDelete.duration} hari - Rp ${planToDelete.price?.toLocaleString('id-ID')}` : ''}
+        onConfirm={confirmDelete}
+        onCancel={() => {
+          setIsDeleteOpen(false);
+          setPlanToDelete(null);
+        }}
+        loading={deleteLoading}
+      />
 
       {/* Modal Result (Success/Error) */}
-      {isResultOpen && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl p-0 w-full max-w-sm overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200">
-            {/* Modal Body */}
-            <div className="px-6 py-8 text-center">
-              <div className="mb-4">
-                {resultType === 'success' ? (
-                  <div className="p-3 bg-green-100 rounded-full w-fit mx-auto">
-                    <CheckCircle className="w-8 h-8 text-green-600" />
-                  </div>
-                ) : resultType === 'error' ? (
-                  <div className="p-3 bg-red-100 rounded-full w-fit mx-auto">
-                    <XCircle className="w-8 h-8 text-red-600" />
-                  </div>
-                ) : (
-                  <div className="p-3 bg-blue-100 rounded-full w-fit mx-auto">
-                    <AlertTriangle className="w-8 h-8 text-blue-600" />
-                  </div>
-                )}
-              </div>
-              <h3 className={`text-lg font-semibold mb-2 ${resultType === 'success' ? 'text-green-700' :
-                  resultType === 'error' ? 'text-red-700' : 'text-blue-700'
-                }`}>
-                {resultType === 'success' ? 'Berhasil!' :
-                  resultType === 'error' ? 'Gagal!' : 'Informasi'}
-              </h3>
-              <p className="text-gray-600 text-sm">
-                {resultMessage}
-              </p>
-            </div>
-
-            {/* Auto progress bar */}
-            <div className="h-1 bg-gray-200">
-              <div
-                className={`h-full transition-all duration-3000 ease-linear progress-animation ${resultType === 'success' ? 'bg-green-500' :
-                    resultType === 'error' ? 'bg-red-500' : 'bg-blue-500'
-                  }`}
-                style={{ width: '0%' }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      <ResultModal
+        isOpen={isResultOpen}
+        type={resultType}
+        message={resultMessage}
+        onClose={() => setIsResultOpen(false)}
+      />
     </div>
   );
 }

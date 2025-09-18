@@ -310,7 +310,7 @@ export default function Subscription() {
 
             {/* Payment Method Selection */}
             <div className="mb-6">
-              <h3 className="font-bold text-lg mb-3">Select Payment Method</h3>
+              <h3 className="font-bold text-lg mb-3">Pilih Metode Pembayaran</h3>
               <div className="space-y-2">
                 {paymentMethods.map((method) => (
                   <label key={method.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
@@ -343,13 +343,13 @@ export default function Subscription() {
             {/* Payment Instructions */}
             {paymentMethod && (
               <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-                <h4 className="font-bold mb-2">Payment Instructions</h4>
+                <h4 className="font-bold mb-2">Instuksi Pembayaran</h4>
                 <div className="text-sm space-y-1">
-                  <p><strong>Transfer to:</strong> {paymentMethods.find(m => m.id === paymentMethod)?.name}</p>
-                  <p><strong>Account Name:</strong> {paymentMethods.find(m => m.id === paymentMethod)?.owner}</p>
-                  <p><strong>Amount:</strong> Rp {selectedPlan?.price.toLocaleString()}</p>
+                  <p><strong>Transfer:</strong> {paymentMethods.find(m => m.id === paymentMethod)?.name}</p>
+                  <p><strong>Nama Akun:</strong> {paymentMethods.find(m => m.id === paymentMethod)?.owner}</p>
+                  <p><strong>Total:</strong> Rp {selectedPlan?.price.toLocaleString()}</p>
                   <p className="text-orange-600 mt-2">
-                    <strong>Note:</strong> Please transfer the exact amount and upload the proof of payment below.
+                    <strong>Note:</strong> Silakan transfer jumlah yang sesuai dan upload bukti pembayaran di bawah ini
                   </p>
                 </div>
               </div>
@@ -357,7 +357,7 @@ export default function Subscription() {
 
             {/* Upload Payment Proof */}
             <div className="mb-6">
-              <h3 className="font-bold text-lg mb-3">Upload Payment Proof</h3>
+              <h3 className="font-bold text-lg mb-3">Upload Bukti Pembayaran</h3>
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                 <input
                   type="file"
@@ -377,7 +377,7 @@ export default function Subscription() {
                       </svg>
                     </div>
                     <p className="text-blue-600 hover:text-blue-800">
-                      Click to upload payment proof
+                      Click untuk upload bukti pembayaran
                     </p>
                     <p className="text-xs text-gray-500">
                       Supported: JPG, PNG (Max: 5MB)
@@ -405,14 +405,14 @@ export default function Subscription() {
                 className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors"
                 disabled={submitting}
               >
-                Cancel
+                Batal
               </button>
               <button
                 onClick={handleSubmitPayment}
                 disabled={submitting}
                 className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {submitting ? 'Submitting...' : 'Submit Payment'}
+                {submitting ? 'Submitting...' : 'Kirim'}
               </button>
             </div>
           </div>

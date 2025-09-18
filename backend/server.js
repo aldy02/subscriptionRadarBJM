@@ -9,6 +9,7 @@ const subscriptionPlanRoutes = require("./routes/subscriptionPlanRoutes")
 const newsRoutes = require("./routes/newsRoutes");
 const subscriptionRoutes = require("./routes/subscriptionRoutes"); 
 const transactionRoutes = require("./routes/transactionRoutes")
+const advertisementRoutes = require("./routes/advertisementRoutes")
 
 dotenv.config();
 const app = express();
@@ -23,6 +24,7 @@ app.use(cors({
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/advertisements", advertisementRoutes);
 app.use("/api/subscription-plans", subscriptionPlanRoutes);
 app.use("/api/news", newsRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
