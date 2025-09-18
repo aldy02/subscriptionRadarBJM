@@ -81,7 +81,7 @@ export default function Iklan() {
   };
 
 
-  // Hapus iklan
+  // Delete iklan
   const handleDelete = (advertisement) => {
     setAdvertisementToDelete(advertisement);
     setIsDeleteOpen(true);
@@ -103,7 +103,7 @@ export default function Iklan() {
     }
   };
 
-  // Buka modal tambah/edit
+  // Open modal tambah/edit
   const openModal = (advertisement = null) => {
     if (advertisement) {
       setEditingAdvertisement(advertisement);

@@ -1,4 +1,3 @@
-// api/advertisementApi.js
 import axios from "./axios";
 
 // Ambil semua iklan
