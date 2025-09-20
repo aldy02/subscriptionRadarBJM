@@ -32,6 +32,39 @@ exports.createSubscriptionTransaction = async (req, res) => {
       });
     }
 
+    // 🔹 CHECK IF USER HAS ACTIVE SUBSCRIPTION
+    const now = new Date();
+    const activeSubscription = await UserSubscription.findOne({
+      where: { 
+        user_id: user_id,
+        is_active: true 
+      },
+      order: [["end_date", "DESC"]],
+    });
+
+    if (activeSubscription) {
+      const endDate = new Date(activeSubscription.end_date);
+      endDate.setHours(23, 59, 59, 999); // Set to end of day
+      
+      // Double check if subscription is really active
+      if (endDate > now) {
+        return res.status(400).json({
+          message: "Anda masih memiliki paket subscription aktif",
+          hasActiveSubscription: true,
+          activeSubscription: {
+            id: activeSubscription.id,
+            endDate: activeSubscription.end_date,
+            daysRemaining: Math.ceil((endDate - now) / (1000 * 60 * 60 * 24))
+          }
+        });
+      } else {
+        // If subscription is expired, deactivate it
+        await activeSubscription.update({ is_active: false });
+        console.log(`Deactivated expired subscription ID: ${activeSubscription.id}`);
+      }
+    }
+    // 🔹 END OF ACTIVE SUBSCRIPTION CHECK
+
     // Ambil data subscription plan
     const subscriptionPlan = await SubscriptionPlan.findByPk(package_id);
     if (!subscriptionPlan) {

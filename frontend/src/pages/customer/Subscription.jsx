@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { Check, X, Copy, Upload, CheckCircle, Clock, CreditCard, Smartphone, Bell, Star, Users, BarChart3, Settings, Headphones, Zap } from "lucide-react";
+import { Check, X, Copy, Upload, CheckCircle, Clock, CreditCard, Smartphone, Bell, Star, Users, BarChart3, Settings, Headphones, Zap, AlertCircle } from "lucide-react";
 import { getPlans } from "../../api/subscriptionPlanApi";
 import { createSubscriptionTransaction } from "../../api/transactionApi";
-import ResultModal from "../../components//ResultModal";
+import ResultModal from "../../components/ResultModal";
 
 export default function Subscription() {
   const [plans, setPlans] = useState([]);
@@ -13,6 +13,11 @@ export default function Subscription() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  
+  // Active subscription check states
+  const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
+  const [showWarningModal, setShowWarningModal] = useState(false);
+  const [activeSubscriptionInfo, setActiveSubscriptionInfo] = useState(null);
   
   // Result Modal states
   const [resultModal, setResultModal] = useState({
@@ -25,6 +30,22 @@ export default function Subscription() {
     { id: "bca", name: "BCA", account: "098877887", owner: "Aldy Rahman" },
     { id: "gopay", name: "GoPay", account: "081234567890", owner: "Aldy Rahman" },
   ];
+
+  // Check subscription status from localStorage (from login response)
+  const checkSubscriptionStatus = () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (user?.role === "customer") {
+        const subscription = JSON.parse(localStorage.getItem("subscription") || "null");
+        if (subscription?.hasActiveSubscription) {
+          setHasActiveSubscription(true);
+          setActiveSubscriptionInfo(subscription);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to check subscription status:", error);
+    }
+  };
 
   useEffect(() => {
     const fetchPlans = async () => {
@@ -39,10 +60,19 @@ export default function Subscription() {
         setLoading(false);
       }
     };
+    
     fetchPlans();
+    checkSubscriptionStatus();
   }, []);
 
   const handleBuy = (plan) => {
+    // Check if user has active subscription
+    if (hasActiveSubscription) {
+      setSelectedPlan(plan);
+      setShowWarningModal(true);
+      return;
+    }
+    
     setSelectedPlan(plan);
     setShowModal(true);
   };
@@ -52,6 +82,11 @@ export default function Subscription() {
     setSelectedPlan(null);
     setPaymentMethod("");
     setProofFile(null);
+  };
+
+  const closeWarningModal = () => {
+    setShowWarningModal(false);
+    setSelectedPlan(null);
   };
 
   const showResultModal = (type, message) => {
@@ -132,7 +167,16 @@ export default function Subscription() {
       closeModal();
     } catch (error) {
       console.error("Submit payment error:", error);
-      showResultModal('error', error.message || 'Terjadi kesalahan saat mengirim pembayaran');
+      
+      // Handle specific error for active subscription
+      if (error.response?.data?.hasActiveSubscription) {
+        setHasActiveSubscription(true);
+        setActiveSubscriptionInfo(error.response.data.activeSubscription);
+        closeModal();
+        setShowWarningModal(true);
+      } else {
+        showResultModal('error', error.response?.data?.message || error.message || 'Terjadi kesalahan saat mengirim pembayaran');
+      }
     } finally {
       setSubmitting(false);
     }
@@ -186,6 +230,21 @@ export default function Subscription() {
           <p className="text-xl text-gray-600">
             Dapatkan akses tak terbatas ke konten berita premium.
           </p>
+          
+          {/* Active Subscription Alert */}
+          {hasActiveSubscription && activeSubscriptionInfo && (
+            <div className="max-w-2xl mx-auto mt-6 p-4 bg-green-50 border border-green-200 rounded-xl">
+              <div className="flex items-center justify-center gap-3">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+                <div className="text-green-800">
+                  <p className="font-semibold">Subscription Aktif</p>
+                  <p className="text-sm">
+                    Subscription Anda akan berakhir dalam {activeSubscriptionInfo.daysRemaining} hari
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {loading && (
@@ -210,7 +269,9 @@ export default function Subscription() {
             return (
               <div
                 key={plan.id}
-                className="relative bg-white rounded-2xl shadow-lg overflow-hidden transition-transform hover:scale-105"
+                className={`relative bg-white rounded-2xl shadow-lg overflow-hidden transition-transform hover:scale-105 ${
+                  hasActiveSubscription ? 'opacity-75' : ''
+                }`}
               >
                 <div className="p-8">
                   {/* Plan Name */}
@@ -259,9 +320,13 @@ export default function Subscription() {
                   {/* Buy Button */}
                   <button
                     onClick={() => handleBuy(plan)}
-                    className="w-full py-3 px-6 rounded-xl font-semibold transition-all duration-200 bg-gray-900 text-white hover:bg-gray-800 hover:shadow-lg"
+                    className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-200 ${
+                      hasActiveSubscription
+                        ? 'bg-gray-400 text-white cursor-not-allowed'
+                        : 'bg-gray-900 text-white hover:bg-gray-800 hover:shadow-lg'
+                    }`}
                   >
-                    Beli Paket
+                    {hasActiveSubscription ? 'Sudah Berlangganan' : 'Beli Paket'}
                   </button>
                 </div>
               </div>
@@ -270,7 +335,46 @@ export default function Subscription() {
         </div>
       </div>
 
-      {/* Enhanced Modal */}
+      {/* Warning Modal for Active Subscription */}
+      {showWarningModal && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+            <div className="p-6 text-center">
+              <div className="mx-auto w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-4">
+                <AlertCircle className="w-8 h-8 text-orange-600" />
+              </div>
+              
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                Subscription Masih Aktif
+              </h3>
+              
+              <p className="text-gray-600 mb-4">
+                Anda masih memiliki paket subscription aktif. Tidak bisa membeli paket baru sampai subscription saat ini berakhir.
+              </p>
+
+              {activeSubscriptionInfo && (
+                <div className="bg-orange-50 p-4 rounded-xl mb-6">
+                  <p className="text-sm text-orange-800">
+                    <strong>Berakhir:</strong> {new Date(activeSubscriptionInfo.endDate).toLocaleDateString('id-ID')}
+                  </p>
+                  <p className="text-sm text-orange-800">
+                    <strong>Sisa Hari:</strong> {activeSubscriptionInfo.daysRemaining} hari
+                  </p>
+                </div>
+              )}
+
+              <button
+                onClick={closeWarningModal}
+                className="w-full bg-orange-600 text-white py-3 px-4 rounded-xl hover:bg-orange-700 transition-colors font-semibold"
+              >
+                Mengerti
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Purchase Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col">
