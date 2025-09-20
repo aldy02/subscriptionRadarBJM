@@ -1,5 +1,6 @@
-const { Transaction, SubscriptionPlan, User, UserSubscription } = require("../models");
+const { Transaction, SubscriptionPlan, User, UserSubscription, Advertisement, AdvertisementContent } = require("../models");
 const { uploadPayment } = require("../middleware/uploadMiddleware");
+const { activateAdvertisementContent, deactivateAdvertisementContent } = require("./advertisementContentController");
 
 // Generate Invoice Number
 const generateInvoiceNumber = () => {
@@ -83,19 +84,35 @@ exports.getUserTransactions = async (req, res) => {
       include: [
         {
           model: User,
-          attributes: ['id', 'name', 'email']
+          attributes: ["id", "name", "email"]
         },
         {
           model: SubscriptionPlan,
-          attributes: ['id', 'name', 'price', 'duration']
+          attributes: ["id", "name", "price", "duration"]
         },
         {
           model: UserSubscription,
-          attributes: ['start_date', 'end_date', 'is_active'], 
+          attributes: ["start_date", "end_date", "is_active"],
           required: false
+        },
+        {
+          model: Advertisement,
+          attributes: ["id", "name", "price", "size"],
+          required: false
+        },
+        {
+          model: AdvertisementContent,
+          attributes: ["id", "start_date", "end_date", "is_active"],
+          required: false,
+          include: [
+            {
+              model: Advertisement,
+              attributes: ["name"]
+            }
+          ]
         }
       ],
-      order: [['created_at', 'DESC']]
+      order: [["created_at", "DESC"]]
     });
 
     res.json({
@@ -182,7 +199,6 @@ exports.getAllTransactions = async (req, res) => {
       order: [['created_at', 'DESC']]
     });
 
-
     res.json({
       success: true,
       data: transactions,
@@ -203,7 +219,7 @@ exports.getAllTransactions = async (req, res) => {
   }
 };
 
-// Update Transaction Status (Admin only)
+// Update Transaction Status (Admin only) - Updated untuk handle advertisement
 exports.updateTransactionStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -230,24 +246,34 @@ exports.updateTransactionStatus = async (req, res) => {
       updated_at: new Date()
     });
 
-    // Jika status accepted dan type subscription, buat user subscription
-    if (status === 'accepted' && transaction.type === 'subscription') {
-      const { UserSubscription, SubscriptionPlan } = require("../models");
+    // Handle berdasarkan type transaksi dan status
+    if (status === 'accepted') {
+      if (transaction.type === 'subscription') {
+        // Create user subscription
+        const { UserSubscription, SubscriptionPlan } = require("../models");
+        const plan = await SubscriptionPlan.findByPk(transaction.package_id);
+        if (plan) {
+          const startDate = new Date();
+          const endDate = new Date();
+          endDate.setDate(startDate.getDate() + plan.duration);
 
-      const plan = await SubscriptionPlan.findByPk(transaction.package_id);
-      if (plan) {
-        const startDate = new Date();
-        const endDate = new Date();
-        endDate.setDate(startDate.getDate() + plan.duration);
-
-        await UserSubscription.create({
-          user_id: transaction.user_id,
-          subscription_plan_id: transaction.package_id,
-          transaction_id: transaction.id,
-          start_date: startDate,
-          end_date: endDate,
-          is_active: true
-        });
+          await UserSubscription.create({
+            user_id: transaction.user_id,
+            subscription_plan_id: transaction.package_id,
+            transaction_id: transaction.id,
+            start_date: startDate,
+            end_date: endDate,
+            is_active: true
+          });
+        }
+      } else if (transaction.type === 'advertisement') {
+        // Activate advertisement content
+        await activateAdvertisementContent(transaction.id);
+      }
+    } else if (status === 'rejected') {
+      if (transaction.type === 'advertisement') {
+        // Deactivate/delete advertisement content
+        await deactivateAdvertisementContent(transaction.id);
       }
     }
 
