@@ -26,7 +26,6 @@ export default function Home() {
           setHasActiveSubscription(true);
         }
       } else if (user?.role === "admin") {
-        // Admin always has access
         setHasActiveSubscription(true);
       }
     } catch (error) {
@@ -226,7 +225,7 @@ export default function Home() {
 
               {/* Content */}
               <div className={`p-6 ${!hasActiveSubscription ? 'opacity-70' : ''}`}>
-                {/* Meta Info */}
+                {/* Info */}
                 <div className="flex items-center text-sm text-gray-500 mb-3">
                   <svg
                     className="w-4 h-4 mr-1"

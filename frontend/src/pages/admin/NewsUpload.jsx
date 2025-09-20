@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Editor } from '@tinymce/tinymce-react';
-import { createNews, getNewsById, updateNews } from "../../api/newsApi"; // Pastikan ada updateNews di API
+import { createNews, getNewsById, updateNews } from "../../api/newsApi";
 import { CheckCircle, XCircle, AlertTriangle, ArrowLeft } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 
@@ -94,7 +94,7 @@ export default function NewsUpload() {
         res = await createNews(formData);
         showResult('success', res.data.message || 'Berita berhasil dipublikasi');
 
-        // Reset form hanya jika create
+        // Reset form jika create
         setTitle("");
         setCategory("Keuangan");
         setAuthor("");

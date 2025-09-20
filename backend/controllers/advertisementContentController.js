@@ -12,7 +12,6 @@ const generateInvoiceNumber = () => {
 };
 
 // Create Advertisement Transaction
-// Create Advertisement Transaction
 exports.createAdvertisementTransaction = async (req, res) => {
   try {
     const { 
@@ -20,7 +19,7 @@ exports.createAdvertisementTransaction = async (req, res) => {
       content, 
       start_date, 
       duration, 
-      total_price, // ← Get the calculated total price from frontend
+      total_price,
       payment_method 
     } = req.body;
     const user_id = req.user.id;
@@ -68,7 +67,7 @@ exports.createAdvertisementTransaction = async (req, res) => {
       });
     }
 
-    // Optional: Validasi bahwa total_price sesuai dengan perhitungan
+    // Validasi bahwa total_price sesuai dengan perhitungan
     const expectedTotal = advertisementPackage.price * parseInt(duration);
     if (parseInt(total_price) !== expectedTotal) {
       return res.status(400).json({
@@ -106,7 +105,7 @@ exports.createAdvertisementTransaction = async (req, res) => {
       photo: photoFile.filename,
       start_date: startDate,
       end_date: endDate,
-      is_active: false // Tidak aktif sampai admin approve
+      is_active: false
     });
 
     res.status(201).json({
@@ -164,7 +163,7 @@ exports.getUserAdvertisements = async (req, res) => {
   }
 };
 
-// Get Active Advertisements (untuk ditampilkan di website)
+// Get Active Advertisements
 exports.getActiveAdvertisements = async (req, res) => {
   try {
     const { size } = req.query;
@@ -231,7 +230,6 @@ exports.getAllAdvertisementContents = async (req, res) => {
       }
     ];
 
-    // Filter berdasarkan status transaksi jika diminta
     if (status) {
       include[2].where = { status };
     }
@@ -294,10 +292,7 @@ exports.deactivateAdvertisementContent = async (transaction_id) => {
     });
 
     if (advertisementContent) {
-      // Hapus atau set is_active ke false - sesuai kebutuhan
       await advertisementContent.destroy();
-      // Atau jika ingin keep record:
-      // await advertisementContent.update({ is_active: false });
     }
 
     return advertisementContent;

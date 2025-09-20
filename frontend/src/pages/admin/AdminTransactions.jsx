@@ -118,7 +118,7 @@ export default function AdminTransactions() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading transactions...</p>
+            <p className="mt-4 text-gray-600">Loading transaksi...</p>
           </div>
         </div>
       </div>
@@ -130,7 +130,7 @@ export default function AdminTransactions() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Manajemen Transaksi</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 mb-2">Manajemen Transaksi</h1>
           <p className="text-gray-600">Kelola dan review semua transaksi</p>
         </div>
 

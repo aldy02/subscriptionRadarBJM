@@ -27,7 +27,7 @@ export const deleteAdvertisement = (id) => {
   return axios.delete(`/advertisements/${id}`);
 };
 
-// ===== Advertisement Transaction (Purchase) APIs =====
+// ===== Advertisement Transaction (Purchase) API =====
 
 // Beli paket iklan (User)
 export const createAdvertisement = (formData) => {

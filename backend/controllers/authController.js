@@ -62,7 +62,7 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: "Password salah" });
     }
 
-    // 🔹 Enhanced subscription check for customer
+    // Enhanced subscription check for customer
     let subscriptionStatus = null;
     if (user.role === "customer") {
       const now = new Date();
@@ -107,7 +107,6 @@ exports.login = async (req, res) => {
         };
       }
     }
-    // 🔹 End of subscription check
 
     // Create JWT token
     const token = jwt.sign(

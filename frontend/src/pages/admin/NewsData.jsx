@@ -83,7 +83,7 @@ const fetchNews = async () => {
     navigate(`/admin/berita/upload/${id}`);
   };
 
-  // Function to get category badge
+  // Get category badge
   const getCategoryBadge = (category) => {
     const categoryColors = {
       "Keuangan": "bg-green-50 text-green-700 border border-green-200",

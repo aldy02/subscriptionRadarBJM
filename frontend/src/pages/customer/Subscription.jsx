@@ -32,7 +32,7 @@ export default function Subscription() {
     { id: "gopay", name: "GoPay", account: "081234567890", owner: "Aldy Rahman" },
   ];
 
-  // Check subscription status from localStorage (from login response)
+  // Check subscription status from localStorage
   const checkSubscriptionStatus = () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
@@ -121,10 +121,10 @@ export default function Subscription() {
     }
 
     // Check file size (2MB limit)
-    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+    const maxSize = 2 * 1024 * 1024;
     if (file.size > maxSize) {
       showResultModal('error', 'Ukuran file terlalu besar! Maksimal 2MB');
-      e.target.value = ''; // Reset input
+      e.target.value = '';
       setProofFile(null);
       return;
     }
@@ -133,7 +133,7 @@ export default function Subscription() {
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
     if (!allowedTypes.includes(file.type)) {
       showResultModal('error', 'Format file tidak didukung! Hanya JPG dan PNG yang diizinkan');
-      e.target.value = ''; // Reset input
+      e.target.value = '';
       setProofFile(null);
       return;
     }

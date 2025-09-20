@@ -19,3 +19,8 @@ export const updatePlan = async (id, data) => {
 export const deletePlan = async (id) => {
   return await api.delete(`/subscription-plans/${id}`);
 };
+
+// Ambil Total Subscription Active
+export const getActiveSubscriptions = async () => {
+  return axios.get("/user-subscriptions/active");
+};

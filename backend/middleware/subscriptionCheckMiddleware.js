@@ -1,6 +1,5 @@
 const { UserSubscription } = require("../models");
 
-// Middleware untuk mengecek subscription aktif
 exports.checkActiveSubscription = async (req, res, next) => {
   try {
     // Hanya check untuk customer
@@ -44,21 +43,20 @@ exports.checkActiveSubscription = async (req, res, next) => {
   }
 };
 
-// Middleware untuk konten premium (opsional - jika ada tier subscription)
+// Middleware untuk konten premium
 exports.checkPremiumSubscription = async (req, res, next) => {
   try {
     if (req.user.role !== "customer") {
       return next();
     }
 
-    // Asumsi ada kolom subscription_type di tabel subscription_plans
     const subscription = await UserSubscription.findOne({
       where: { 
         user_id: req.user.id,
         is_active: true 
       },
       include: [{
-        model: require("../models/subscription_plans"), // Adjust sesuai model Anda
+        model: require("../models/subscription_plans"),
         attributes: ["type", "name"]
       }],
       order: [["end_date", "DESC"]],
@@ -71,7 +69,7 @@ exports.checkPremiumSubscription = async (req, res, next) => {
       });
     }
 
-    // Check if it's premium subscription (adjust logic sesuai kebutuhan)
+    // Check if it's premium subscription
     if (subscription.SubscriptionPlan.type !== "premium") {
       return res.status(403).json({ 
         message: "Upgrade ke premium subscription untuk mengakses konten ini",

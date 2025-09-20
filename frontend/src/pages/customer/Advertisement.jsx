@@ -141,7 +141,7 @@ export default function Advertisement() {
     }
 
     // Check file size (2MB limit)
-    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+    const maxSize = 2 * 1024 * 1024;
     if (file.size > maxSize) {
       showResultModal('error', 'Ukuran bukti pembayaran terlalu besar! Maksimal 2MB');
       e.target.value = '';
@@ -200,7 +200,7 @@ export default function Advertisement() {
       formData.append("photo", photo);
       formData.append("start_date", startDate);
       formData.append("duration", duration);
-      formData.append("total_price", totalPrice.toString()); // Send calculated total price
+      formData.append("total_price", totalPrice.toString());
       formData.append("payment_method", paymentMethod);
       formData.append("proof_payment", proofFile);
 

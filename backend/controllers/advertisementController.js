@@ -39,7 +39,7 @@ const createAdvertisement = async (req, res) => {
   try {
     const { name, size, price } = req.body;
 
-    // Improved validation - check for undefined, null, and empty string
+    // Check for undefined, null, and empty string
     if (!name || name.trim() === '') {
       return res.status(400).json({
         success: false,
@@ -54,7 +54,7 @@ const createAdvertisement = async (req, res) => {
       });
     }
 
-    // Better price validation - check if price exists and is valid number
+    // Price validation - check if price exists and is valid number
     if (price === undefined || price === null || price === '') {
       return res.status(400).json({
         success: false,

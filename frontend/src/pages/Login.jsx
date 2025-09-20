@@ -19,11 +19,9 @@ export default function Login() {
         try {
             const res = await api.post("/auth/login", formData);
 
-            // Save token & user data to localstorage
             localStorage.setItem("token", res.data.token);
             localStorage.setItem("user", JSON.stringify(res.data.user));
 
-            // 🔹 SAVE SUBSCRIPTION DATA IF EXISTS
             if (res.data.subscription) {
                 localStorage.setItem("subscription", JSON.stringify(res.data.subscription));
                 console.log("Subscription data saved:", res.data.subscription);
@@ -35,7 +33,6 @@ export default function Login() {
                     setSubscriptionWarning(`Subscription Anda akan berakhir dalam ${res.data.subscription.daysRemaining} hari. Perpanjang sekarang!`);
                 }
             } else {
-                // Clear any existing subscription data for non-customers
                 localStorage.removeItem("subscription");
             }
 
@@ -47,9 +44,8 @@ export default function Login() {
                     } else {
                         navigate("/");
                     }
-                }, 2000); // Wait 2 seconds to show warning
+                }, 2000);
             } else {
-                // Immediate redirect if no warnings
                 if (res.data.user.role === "admin") {
                     navigate("/admin");
                 } else {

@@ -5,7 +5,6 @@ import ResultModal from "../../components/ResultModal";
 import DeleteModal from "../../components/DeleteModal";
 
 export default function Iklan() {
-  // ... semua state sama seperti sebelumnya
   const [advertisements, setAdvertisements] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
@@ -23,7 +22,6 @@ export default function Iklan() {
   const [resultType, setResultType] = useState('');
   const [resultMessage, setResultMessage] = useState('');
 
-  // Ambil data advertisements
   const fetchAdvertisements = async () => {
     setLoading(true);
     try {
@@ -41,7 +39,6 @@ export default function Iklan() {
     fetchAdvertisements();
   }, [search]);
 
-  // Show result modal
   const showResult = (type, message) => {
     setResultType(type);
     setResultMessage(message);
@@ -51,14 +48,9 @@ export default function Iklan() {
     }, 3000);
   };
 
-  // Submit form add/update - DIPERBAIKI
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Debug: Log data yang akan dikirim
-    console.log('Form data:', formData);
-    
-    // Pastikan price adalah number
     const submitData = {
       ...formData,
       price: Number(formData.price)
@@ -71,7 +63,6 @@ export default function Iklan() {
         await updateAdvertisement(editingAdvertisement.id, submitData);
         showResult('success', 'Paket iklan berhasil diperbarui');
       } else {
-        // UBAH DARI createAdvertisement KE createAdvertisementPackage
         await createAdvertisementPackage(submitData);
         showResult('success', 'Paket iklan berhasil ditambahkan');
       }

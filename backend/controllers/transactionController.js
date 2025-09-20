@@ -32,7 +32,6 @@ exports.createSubscriptionTransaction = async (req, res) => {
       });
     }
 
-    // 🔹 CHECK IF USER HAS ACTIVE SUBSCRIPTION
     const now = new Date();
     const activeSubscription = await UserSubscription.findOne({
       where: { 
@@ -44,7 +43,7 @@ exports.createSubscriptionTransaction = async (req, res) => {
 
     if (activeSubscription) {
       const endDate = new Date(activeSubscription.end_date);
-      endDate.setHours(23, 59, 59, 999); // Set to end of day
+      endDate.setHours(23, 59, 59, 999);
       
       // Double check if subscription is really active
       if (endDate > now) {
@@ -63,7 +62,6 @@ exports.createSubscriptionTransaction = async (req, res) => {
         console.log(`Deactivated expired subscription ID: ${activeSubscription.id}`);
       }
     }
-    // 🔹 END OF ACTIVE SUBSCRIPTION CHECK
 
     // Ambil data subscription plan
     const subscriptionPlan = await SubscriptionPlan.findByPk(package_id);

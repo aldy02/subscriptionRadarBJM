@@ -35,7 +35,7 @@ exports.createSubscription = async (req, res) => {
   }
 };
 
-// Customer lihat langganan miliknya
+// Customer lihat langganan mereka
 exports.getMySubscriptions = async (req, res) => {
   try {
     const subscriptions = await UserSubscription.findAll({
