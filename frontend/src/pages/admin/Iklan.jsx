@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
-import { getAdvertisements, createAdvertisement, updateAdvertisement, deleteAdvertisement } from "../../api/advertisementApi";
+import { getAdvertisements, createAdvertisementPackage, updateAdvertisement, deleteAdvertisement } from "../../api/advertisementApi";
 import { Plus, Edit2, Trash2, Search } from "lucide-react";
 import ResultModal from "../../components/ResultModal";
 import DeleteModal from "../../components/DeleteModal";
 
 export default function Iklan() {
+  // ... semua state sama seperti sebelumnya
   const [advertisements, setAdvertisements] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
-
-  // State modal add/edit
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAdvertisement, setEditingAdvertisement] = useState(null);
   const [formData, setFormData] = useState({
@@ -17,13 +16,9 @@ export default function Iklan() {
     size: "",
     price: "",
   });
-
-  // State modal delete
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [advertisementToDelete, setAdvertisementToDelete] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
-
-  // State modal success/error
   const [isResultOpen, setIsResultOpen] = useState(false);
   const [resultType, setResultType] = useState('');
   const [resultMessage, setResultMessage] = useState('');
@@ -42,7 +37,6 @@ export default function Iklan() {
     }
   };
 
-
   useEffect(() => {
     fetchAdvertisements();
   }, [search]);
@@ -52,22 +46,33 @@ export default function Iklan() {
     setResultType(type);
     setResultMessage(message);
     setIsResultOpen(true);
-
-    // Auto close after 3 seconds
     setTimeout(() => {
       setIsResultOpen(false);
     }, 3000);
   };
 
-  // Submit form add/update
+  // Submit form add/update - DIPERBAIKI
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Debug: Log data yang akan dikirim
+    console.log('Form data:', formData);
+    
+    // Pastikan price adalah number
+    const submitData = {
+      ...formData,
+      price: Number(formData.price)
+    };
+    
+    console.log('Submit data:', submitData);
+    
     try {
       if (editingAdvertisement) {
-        await updateAdvertisement(editingAdvertisement.id, formData);
+        await updateAdvertisement(editingAdvertisement.id, submitData);
         showResult('success', 'Paket iklan berhasil diperbarui');
       } else {
-        await createAdvertisement(formData);
+        // UBAH DARI createAdvertisement KE createAdvertisementPackage
+        await createAdvertisementPackage(submitData);
         showResult('success', 'Paket iklan berhasil ditambahkan');
       }
       setIsModalOpen(false);
@@ -75,11 +80,11 @@ export default function Iklan() {
       setEditingAdvertisement(null);
       fetchAdvertisements();
     } catch (error) {
+      console.error('Submit error:', error);
       const errorMsg = error.response?.data?.message || 'Gagal menyimpan iklan';
       showResult('error', errorMsg);
     }
   };
-
 
   // Delete iklan
   const handleDelete = (advertisement) => {
@@ -107,7 +112,11 @@ export default function Iklan() {
   const openModal = (advertisement = null) => {
     if (advertisement) {
       setEditingAdvertisement(advertisement);
-      setFormData(advertisement);
+      setFormData({
+        name: advertisement.name,
+        size: advertisement.size,
+        price: advertisement.price
+      });
     } else {
       setEditingAdvertisement(null);
       setFormData({ name: "", size: "", price: "" });
@@ -307,7 +316,6 @@ export default function Iklan() {
                     required
                   />
                 </div>
-
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">

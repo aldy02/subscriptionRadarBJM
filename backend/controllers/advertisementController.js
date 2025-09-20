@@ -39,15 +39,38 @@ const createAdvertisement = async (req, res) => {
   try {
     const { name, size, price } = req.body;
 
-    // Validation
-    if (!name || !size || !price) {
+    // Improved validation - check for undefined, null, and empty string
+    if (!name || name.trim() === '') {
       return res.status(400).json({
         success: false,
-        message: "Semua field wajib diisi"
+        message: "Nama iklan wajib diisi"
       });
     }
 
-    if (price < 0) {
+    if (!size || size.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        message: "Ukuran wajib diisi"
+      });
+    }
+
+    // Better price validation - check if price exists and is valid number
+    if (price === undefined || price === null || price === '') {
+      return res.status(400).json({
+        success: false,
+        message: "Harga wajib diisi"
+      });
+    }
+
+    const numericPrice = Number(price);
+    if (isNaN(numericPrice)) {
+      return res.status(400).json({
+        success: false,
+        message: "Harga harus berupa angka"
+      });
+    }
+
+    if (numericPrice < 0) {
       return res.status(400).json({
         success: false,
         message: "Harga tidak boleh negatif"
@@ -55,9 +78,9 @@ const createAdvertisement = async (req, res) => {
     }
 
     const advertisement = await Advertisement.create({
-      name,
-      size,
-      price: parseInt(price),
+      name: name.trim(),
+      size: size.trim(),
+      price: numericPrice,
       created_at: new Date(),
       updated_at: new Date()
     });
@@ -92,15 +115,37 @@ const updateAdvertisement = async (req, res) => {
       });
     }
 
-    // Validation
-    if (!name || !size || !price) {
+    // Improved validation - same as create
+    if (!name || name.trim() === '') {
       return res.status(400).json({
         success: false,
-        message: "Semua field wajib diisi"
+        message: "Nama iklan wajib diisi"
       });
     }
 
-    if (price < 0) {
+    if (!size || size.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        message: "Ukuran wajib diisi"
+      });
+    }
+
+    if (price === undefined || price === null || price === '') {
+      return res.status(400).json({
+        success: false,
+        message: "Harga wajib diisi"
+      });
+    }
+
+    const numericPrice = Number(price);
+    if (isNaN(numericPrice)) {
+      return res.status(400).json({
+        success: false,
+        message: "Harga harus berupa angka"
+      });
+    }
+
+    if (numericPrice < 0) {
       return res.status(400).json({
         success: false,
         message: "Harga tidak boleh negatif"
@@ -108,9 +153,9 @@ const updateAdvertisement = async (req, res) => {
     }
 
     await advertisement.update({
-      name,
-      size,
-      price: parseInt(price),
+      name: name.trim(),
+      size: size.trim(),
+      price: numericPrice,
       updated_at: new Date()
     });
 
