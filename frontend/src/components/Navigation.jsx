@@ -6,10 +6,10 @@ export default function Navigation() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
+const handleLogout = () => {
+  localStorage.clear();
+  navigate("/login");
+};
 
   return (
     <nav className="bg-white border-b border-gray-200 shadow-sm px-12 py-3 flex items-center justify-between">

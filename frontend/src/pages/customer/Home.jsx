@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Lock } from "lucide-react";
 import { getAllNews } from "../../api/newsApi";
 
 export default function Home() {
@@ -7,18 +8,39 @@ export default function Home() {
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showAll, setShowAll] = useState(false); // NEW
+  const [showAll, setShowAll] = useState(false);
+  const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
   useEffect(() => {
     fetchLatestNews();
+    checkSubscriptionStatus();
   }, []);
+
+  const checkSubscriptionStatus = () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (user?.role === "customer") {
+        const subscription = JSON.parse(localStorage.getItem("subscription") || "null");
+        if (subscription?.hasActiveSubscription) {
+          setHasActiveSubscription(true);
+        }
+      } else if (user?.role === "admin") {
+        // Admin always has access
+        setHasActiveSubscription(true);
+      }
+    } catch (error) {
+      console.error("Failed to check subscription status:", error);
+      setHasActiveSubscription(false);
+    }
+  };
 
   const fetchLatestNews = async () => {
     try {
       setLoading(true);
       const response = await getAllNews({
         page: 1,
-        limit: 1000, // ambil semua biar bisa ditampilkan semua
+        limit: 1000,
       });
 
       const newsData = response.data.news || response.data || [];
@@ -38,7 +60,18 @@ export default function Home() {
   };
 
   const handleReadMore = (newsId) => {
+    // Check if user has active subscription
+    if (!hasActiveSubscription) {
+      setShowSubscriptionModal(true);
+      return;
+    }
+    
     navigate(`/${newsId}`);
+  };
+
+  const handleSubscriptionRedirect = () => {
+    setShowSubscriptionModal(false);
+    navigate('/subscription');
   };
 
   const calculateReadTime = (content) => {
@@ -65,7 +98,6 @@ export default function Home() {
     );
   }
 
-  // kalau showAll false → ambil 3 berita, kalau true → semua
   const displayedNews = showAll ? news : news.slice(0, 3);
 
   return (
@@ -78,6 +110,27 @@ export default function Home() {
           <p className="text-xl text-gray-600 max-w-3xl">
             Tetap update dengan informasi perkembangan dan tren terbaru.
           </p>
+          
+          {/* Subscription Status Alert */}
+          {!hasActiveSubscription && (
+            <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="flex items-center gap-2">
+                <Lock className="w-5 h-5 text-yellow-600" />
+                <div>
+                  <p className="text-yellow-800 font-medium">Subscription Diperlukan</p>
+                  <p className="text-yellow-700 text-sm">
+                    Beli paket berlangganan untuk membaca berita berita lengkap.{" "}
+                    <button
+                      onClick={() => navigate('/subscription')}
+                      className="underline hover:text-yellow-900 font-medium"
+                    >
+                      Lihat Paket
+                    </button>
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Error State */}
@@ -107,7 +160,7 @@ export default function Home() {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+                  d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 01-2-2V9.5a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
                 />
               </svg>
             </div>
@@ -125,18 +178,33 @@ export default function Home() {
           {displayedNews.map((article) => (
             <div
               key={article.id}
-              className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+              className={`bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 ${
+                !hasActiveSubscription ? 'relative' : ''
+              }`}
             >
+              {/* Lock Overlay for non-subscribers */}
+              {!hasActiveSubscription && (
+                <div className="absolute inset-0 bg-gray-900/20 z-10 flex items-center justify-center">
+                  <div className="bg-white rounded-full p-3 shadow-lg">
+                    <Lock className="w-8 h-8 text-gray-600" />
+                  </div>
+                </div>
+              )}
+
               {/* Image */}
               <div className="relative h-48 bg-gray-200">
                 {article.photo ? (
                   <img
                     src={`http://localhost:5000/uploads/news/${article.photo}`}
                     alt={article.title}
-                    className="w-full h-full object-cover"
+                    className={`w-full h-full object-cover ${
+                      !hasActiveSubscription ? 'filter blur-sm' : ''
+                    }`}
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
+                  <div className={`w-full h-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center ${
+                    !hasActiveSubscription ? 'filter blur-sm' : ''
+                  }`}>
                     <span className="text-white text-lg font-medium">
                       {article.category || "News"}
                     </span>
@@ -146,7 +214,9 @@ export default function Home() {
                 {article.category && (
                   <div className="absolute top-4 left-4">
                     <span
-                      className={`px-3 py-1 rounded-full text-white text-sm font-medium bg-blue-600`}
+                      className={`px-3 py-1 rounded-full text-white text-sm font-medium bg-blue-600 ${
+                        !hasActiveSubscription ? 'opacity-50' : ''
+                      }`}
                     >
                       {article.category}
                     </span>
@@ -155,7 +225,7 @@ export default function Home() {
               </div>
 
               {/* Content */}
-              <div className="p-6">
+              <div className={`p-6 ${!hasActiveSubscription ? 'opacity-70' : ''}`}>
                 {/* Meta Info */}
                 <div className="flex items-center text-sm text-gray-500 mb-3">
                   <svg
@@ -191,19 +261,36 @@ export default function Home() {
 
                 {/* Content Preview */}
                 <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                  {stripHtml(article.content).length > 150
+                  {!hasActiveSubscription 
+                    ? "Berlangganan untuk membaca artikel lengkap..."
+                    : stripHtml(article.content).length > 150
                     ? `${stripHtml(article.content).substring(0, 150)}...`
-                    : stripHtml(article.content)}
+                    : stripHtml(article.content)
+                  }
                 </p>
 
                 {/* Read More Button */}
                 <button
                   onClick={() => handleReadMore(article.id)}
-                  className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200">
-                  Read more
-                  <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
-                  </svg>
+                  className={`inline-flex items-center font-medium transition-colors duration-200 ${
+                    hasActiveSubscription
+                      ? 'text-blue-600 hover:text-blue-800'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  {hasActiveSubscription ? (
+                    <>
+                      Read more
+                      <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
+                      </svg>
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="w-4 h-4 mr-1" />
+                      Subscribe to read
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -222,6 +309,42 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      {/* Subscription Required Modal */}
+      {showSubscriptionModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+            <div className="p-6 text-center">
+              <div className="mx-auto w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-4">
+                <Lock className="w-8 h-8 text-yellow-600" />
+              </div>
+              
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                Subscription Diperlukan
+              </h3>
+              
+              <p className="text-gray-600 mb-6">
+                Untuk membaca artikel berita lengkap, Anda perlu berlangganan terlebih dahulu. Pilih paket yang sesuai dengan kebutuhan Anda.
+              </p>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowSubscriptionModal(false)}
+                  className="flex-1 bg-gray-100 text-gray-700 py-3 px-4 rounded-xl hover:bg-gray-200 transition-colors font-semibold"
+                >
+                  Nanti
+                </button>
+                <button
+                  onClick={handleSubscriptionRedirect}
+                  className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-xl hover:bg-blue-700 transition-colors font-semibold"
+                >
+                  Lihat Paket
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
