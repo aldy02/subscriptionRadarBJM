@@ -412,7 +412,7 @@ export default function Advertisement() {
                 {/* Schedule Section */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                   <div>
-                    <label className="block font-bold text-gray-900 mb-2 flex items-center gap-2">
+                    <label className="font-bold text-gray-900 mb-2 flex items-center gap-2">
                       <Calendar className="w-4 h-4" />
                       Tanggal Mulai
                     </label>
@@ -425,7 +425,7 @@ export default function Advertisement() {
                     />
                   </div>
                   <div>
-                    <label className="block font-bold text-gray-900 mb-2 flex items-center gap-2">
+                    <label className="font-bold text-gray-900 mb-2 flex items-center gap-2">
                       <Clock className="w-4 h-4" />
                       Durasi (hari)
                     </label>
