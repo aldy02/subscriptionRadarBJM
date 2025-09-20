@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Check, X, Copy, Upload, CheckCircle, Clock, CreditCard, Smartphone, Bell, Star, Users, BarChart3, Settings, Headphones, Zap, AlertCircle } from "lucide-react";
+import { Check, X, Copy, Upload, CheckCircle, Clock, CreditCard, Smartphone, Bell, Star, Users, BarChart3, Settings, Headphones, Zap } from "lucide-react";
 import { getPlans } from "../../api/subscriptionPlanApi";
 import { createSubscriptionTransaction } from "../../api/transactionApi";
 import ResultModal from "../../components/ResultModal";
+import WarningModal from "../../components/WarningActiveSubscriptionModal";
 
 export default function Subscription() {
   const [plans, setPlans] = useState([]);
@@ -336,43 +337,14 @@ export default function Subscription() {
       </div>
 
       {/* Warning Modal for Active Subscription */}
-      {showWarningModal && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
-            <div className="p-6 text-center">
-              <div className="mx-auto w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-4">
-                <AlertCircle className="w-8 h-8 text-orange-600" />
-              </div>
-              
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Subscription Masih Aktif
-              </h3>
-              
-              <p className="text-gray-600 mb-4">
-                Anda masih memiliki paket subscription aktif. Tidak bisa membeli paket baru sampai subscription saat ini berakhir.
-              </p>
-
-              {activeSubscriptionInfo && (
-                <div className="bg-orange-50 p-4 rounded-xl mb-6">
-                  <p className="text-sm text-orange-800">
-                    <strong>Berakhir:</strong> {new Date(activeSubscriptionInfo.endDate).toLocaleDateString('id-ID')}
-                  </p>
-                  <p className="text-sm text-orange-800">
-                    <strong>Sisa Hari:</strong> {activeSubscriptionInfo.daysRemaining} hari
-                  </p>
-                </div>
-              )}
-
-              <button
-                onClick={closeWarningModal}
-                className="w-full bg-orange-600 text-white py-3 px-4 rounded-xl hover:bg-orange-700 transition-colors font-semibold"
-              >
-                Mengerti
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <WarningModal
+        isOpen={showWarningModal}
+        title="Subscription Masih Aktif"
+        message="Anda masih memiliki paket subscription aktif. Tidak bisa membeli paket baru sampai subscription saat ini berakhir."
+        details={activeSubscriptionInfo}
+        onConfirm={closeWarningModal}
+        confirmText="Mengerti"
+      />
 
       {/* Purchase Modal */}
       {showModal && (
