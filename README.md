@@ -2,9 +2,9 @@
 
 **SubscriptionRadarBJM** adalah aplikasi portal berita untuk **Radar Banjarmasin**.  
 Pengguna dapat:
-- 📖 Membaca berita dan iklan.
-- 📰 Melihat daftar iklan yang tersedia.
+- 📖 Membaca berita.
 - 💳 Melakukan berlangganan.
+- 📰 Melihat daftar iklan yang tersedia.
 - 📝 Memesan pemasangan iklan koran secara online.  
 
 Proyek ini dibangun menggunakan **MERN Stack**:
