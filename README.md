@@ -17,7 +17,7 @@ Proyek ini dibangun menggunakan **MERN Stack**:
 ---
 
 ## 🚀 Fitur Utama
-✅ Membaca iklan dan berita terbaru.  
+✅ Membaca berita terbaru.  
 ✅ Sistem berlangganan untuk pengguna.  
 ✅ Pemesanan pemasangan iklan koran secara online.  
 ✅ Antarmuka modern dengan **TailwindCSS**.  
