@@ -24,11 +24,6 @@ export default function CustomerLayout() {
                   <span>•</span>
                   <span>© {new Date().getFullYear()} All rights reserved.</span>
                 </div>
-                <div className="flex gap-4 text-sm">
-                  <a href="#" className="hover:text-blue-600 transition-colors">Privacy Policy</a>
-                  <a href="#" className="hover:text-blue-600 transition-colors">Terms of Service</a>
-                  <a href="#" className="hover:text-blue-600 transition-colors">Contact</a>
-                </div>
               </div>
             </div>
           </footer>
